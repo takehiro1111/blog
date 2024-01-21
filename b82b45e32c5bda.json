@@ -1,0 +1,13 @@
+{
+  "title": "GithubのSSH keys設定手順",
+  "closed": false,
+  "archived": false,
+  "created_at": "2024-01-21",
+  "comments": [
+    {
+      "author": "takesaya",
+      "created_at": "2024-01-21",
+      "body_markdown": "1.キーペア作成\nssh-keygen -t {暗号化タイプ} -b {ビット(長さ)} -f {ファイル名}\nssh-keygen -t rsa -b 2048 -f hcl\n\n2.~/.ssh/configへ設定\nHost github github.com\n  HostName github.com\n  IdentityFile ~/.ssh/{公開鍵のファイル名}\n  User git\n\n3.Githubと接続出来ているか確認\nssh -T git@github.com\n\n"
+    }
+  ]
+}
