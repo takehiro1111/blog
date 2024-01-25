@@ -7,7 +7,7 @@ published: true
 ---
 
 # historyコマンド
-- historyコマンドで行番号を表示させない方法を記載します。
+- historyコマンドで行番号を表示させない方法を記載しています。
 
 ```コマンド
 history | awk '{$1=""; print $0}'
