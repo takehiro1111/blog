@@ -1,5 +1,5 @@
 ---
-title: "historyコマンドのナンバーを表示しない方法"
+title: "historyコマンドの行番号を表示しない方法"
 emoji: "🎉"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: []
