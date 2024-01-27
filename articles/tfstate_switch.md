@@ -2,7 +2,7 @@
 title: "ステートファイルの切り替えコマンド"
 emoji: "🎉"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: []
+topics: ["Terraform","aws","IaC","SRE","インフラエンジニア"]
 published: false
 ---
 
