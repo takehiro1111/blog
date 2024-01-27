@@ -384,6 +384,6 @@ terragrunt init -reconfigure
 
  https://www.oreilly.co.jp/books/9784814400522/
 
-- リポジトリ
+- Githubリポジトリ
 
- https://github.com/takehiro1111/terragrunt
+ @[card](https://github.com/takehiro1111/terragrunt)
