@@ -6,6 +6,8 @@ topics: ["Terraform","aws","IaC","SRE","インフラエンジニア"]
 published: true
 ---
 
+![](/images/terraform_logo.png)
+
 ## backend設定の切り替え
 
 - backendを別設定へ切り替える際は、コードの記述を変更して以下コマンドを実行します。
@@ -51,7 +53,7 @@ backend "s3" {
 ```
 terraform init -migrate-state
 ```
-![](images/tfstate_switch/init_migrate_state.png)
+![](/images/tfstate_switch/init_migrate_state.png)
 
 &nbsp;
 - 例2）S3からlocalに戻す場合(ステートファイルに差異がなく直後に切り戻す場合)
@@ -74,4 +76,4 @@ backend "local" {
 ```
 terraform init -reconfigure
 ```
-![](images/tfstate_switch/init_reconfigure.png)
+![](/images/tfstate_switch/init_reconfigure.png)

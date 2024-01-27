@@ -370,13 +370,13 @@ terragrunt init -reconfigure
 // 既存のステートファイルから未作成のS3バケットを指定し直して同時に作成するために実行
 ```
 
-![](images/terraform_tfstate/terragrunt_make_backend.png)
+![](/images/terraform_tfstate/terragrunt_make_backend.png)
 
 実際にbackendになるS3バケット設定されている事を確認。
 - 旧バケット:terragrunt-test-old
 - 新バケット:terragrunt-test-new
 
-![](images/terraform_tfstate/aws_s3_ls.png)
+![](/images/terraform_tfstate/aws_s3_ls.png)
 
 
 ## 参考
