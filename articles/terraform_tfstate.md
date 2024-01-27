@@ -1,9 +1,9 @@
 ---
-title: "ステートファイルの管理方法,切り替え"
+title: "ステートファイルの管理方法(local,s3,terragrunt等)"
 emoji: "🕌"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: []
-published: false
+topics: ["Terraform","aws","IaC","SRE","インフラエンジニア"]
+published: true
 ---
 
 ![](/images/terraform_logo.png)
@@ -364,9 +364,26 @@ terragrunt run-all init
 ```
 ![](/images/terraform_tfstate/terragrunt_run_all_init.png)
 
+###### リモートバックエンド(S3)の自動作成の挙動
+```none:実行コマンド
+terragrunt init -reconfigure 
+// 既存のステートファイルから未作成のS3バケットを指定し直して同時に作成するために実行
+```
+
+![](images/terraform_tfstate/terragrunt_make_backend.png)
+
+実際にbackendになるS3バケット設定されている事を確認。
+- 旧バケット:terragrunt-test-old
+- 新バケット:terragrunt-test-new
+
+![](images/terraform_tfstate/aws_s3_ls.png)
 
 
 ## 参考
 - 詳解 Terraform 第3版 
 
  https://www.oreilly.co.jp/books/9784814400522/
+
+- リポジトリ
+
+ https://github.com/takehiro1111/terragrunt

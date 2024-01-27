@@ -3,7 +3,7 @@ title: "ステートファイルの切り替えコマンド"
 emoji: "🎉"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Terraform","aws","IaC","SRE","インフラエンジニア"]
-published: false
+published: true
 ---
 
 ## backend設定の切り替え
