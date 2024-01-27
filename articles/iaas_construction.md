@@ -94,7 +94,8 @@ locals {
 - variable 変数の設定を記述する。 
 ```hcl:variables.tf
 variable "cidr_block" {
-    description = "VPC,Subnet の CIDR ブロックを定義" type = list(string)
+    description = "VPC,Subnet の CIDR ブロックを定義" 
+    type = list(string)
     default = ["192.168.0.0/24","192.168.0.0/28"]
 }
 ```
@@ -172,6 +173,7 @@ resource "aws_route_table_association" "test" {
 resource "aws_security_group" "test" {
     description = "sg for http" name = "test"
     vpc_id = aws_vpc.test.id
+    
     tags = {
         Name = "test-sg"
     } 
@@ -197,6 +199,7 @@ resource "aws_vpc_security_group_egress_rule" "http" {
     security_group_id = aws_security_group.test.id 
     cidr_ipv4 = local.internet
     ip_protocol = "all"
+    
     tags = {
         Name = "out-http"
     } 
