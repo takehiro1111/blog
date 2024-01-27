@@ -279,7 +279,7 @@ terraform init -backend-config=../backend.hcl
 - 全てのモジュールに対して一括操作が可能。(個別のterraformコマンドの操作も可能。)
 メインdirから以下コマンドを実行し、サブディレクトリに存在するモジュールを更新できる。
 `terragrunt run-all {init/plan/apply/destroy等}`
-- リモートバックエンドの自動作成
+- リモートバックエンドの自動作成(以下に説明あり)
 
 
 ###### デメリット
