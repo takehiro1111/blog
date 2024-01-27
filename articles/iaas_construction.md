@@ -22,7 +22,7 @@ published: true
 ### 構成
   - Apache に設定した index.html の内容が表示される事をゴールとして Terraform で AWS 環境を構築する。
 
-![](/images/iaas.png)
+![](/images/iaas_construction/iaas.png)
 &nbsp;
 
 ### ファイル配置
@@ -31,7 +31,7 @@ published: true
 
   - 単一のファイルに全てのコードを纏めて記述すると保守性、視認性、可読性の観点で良くないため、リソースのカテゴリごとに分割して作成しています。 (例:network.tf→VPC,Subnet,インターネットゲートウェイ,ルートテーブル) 
 
-![](/images/tree_1.png)
+![](/images/iaas_construction/tree_1.png)
 &nbsp;
 
 ### 実際のコード
@@ -246,4 +246,4 @@ terraform destroy // index.html の表示が確認出来れば、後片付けで
 
 &nbsp;
 - 以下のようにhttp接続が確認でき、index.htmlの内容が表示されれば、完了。
-![](/images/curl.png)
+![](/images/iaas_construction/curl.png)
