@@ -42,7 +42,7 @@ backend "s3" {
     encrypt = true
   }
 ```
-:::note warn
+:::message
 コマンドを実行しないと以下エラーになる。
 :::
 ![](/images/tfstate_switch/init_fail.png)

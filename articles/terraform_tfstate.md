@@ -182,7 +182,7 @@ terraform {
 }
 ```
 
-:::note warn
+:::message
 S3バケットをbackendに設定する場合、以下のようにバケットポリシーを設定してTerraformがS3バケットに対する操作を可能にする必要がある。
 :::
 
