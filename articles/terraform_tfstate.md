@@ -1,5 +1,5 @@
 ---
-title: "ステートファイルの管理方法(local,s3,terragrunt等)"
+title: "[Terraform/AWS] ステートファイルの管理方法(local,s3,terragrunt等)"
 emoji: "🕌"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Terraform","aws","IaC","SRE","インフラエンジニア"]

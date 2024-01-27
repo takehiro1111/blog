@@ -1,5 +1,5 @@
 ---
-title: "ステートファイルの切り替えコマンド"
+title: "[Terraform/AWS] ステートファイルの切り替えコマンド"
 emoji: "🎉"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Terraform","aws","IaC","SRE","インフラエンジニア"]

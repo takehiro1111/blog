@@ -1,5 +1,5 @@
 ---
-title: "[Terraform / AWS] 簡単な Iaas 環境の構築"
+title: "[Terraform/AWS] 簡単な Iaas 環境の構築"
 emoji: "📑"
 type: "tech"
 topics: ["Terraform","aws","IaC","SRE","インフラエンジニア"]
