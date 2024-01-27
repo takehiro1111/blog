@@ -356,6 +356,14 @@ resource "aws_instance" "test" {
 }
 ```
 
+###### コマンドの実行
+- 親モジュールで以下コマンドを実行した際に様子。
+```none:コマンド
+terragrunt run-all init
+```
+![](/images/terraform_tfstate/terragrunt_run_all_init.png)
+
+
 
 ## 参考
 - 詳解 Terraform 第3版 
