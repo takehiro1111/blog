@@ -293,8 +293,6 @@ terraform init -backend-config=../backend.hcl
 
 以下のディレクトリ構成でメインディレクトリ内でterragruntコマンドを実行。
 
-
-
 ```hcl:./config.tf
 terraform {
   required_version = "1.6.5"
@@ -364,4 +362,5 @@ resource "aws_instance" "test" {
 
 ## 参考
 - 詳解 Terraform 第3版 
+
  https://www.oreilly.co.jp/books/9784814400522/

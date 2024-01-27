@@ -42,7 +42,7 @@ backend "s3" {
     encrypt = true
   }
 ```
-:::warn
+:::note warn
 コマンドを実行しないと以下エラーになる。
 :::
 ![](/images/tfstate_switch/init_fail.png)
@@ -54,7 +54,7 @@ terraform init -migrate-state
 ![](images/tfstate_switch/init_migrate_state.png)
 
 &nbsp;
-- S3からlocalに戻す場合(ステートファイルに差異がなく直後に切り戻す場合を想定。)
+- 例2）S3からlocalに戻す場合(ステートファイルに差異がなく直後に切り戻す場合)
 
 ```
 backend "s3" {
