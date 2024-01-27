@@ -3,7 +3,7 @@ title: "[Terraform / AWS] 簡単な Iaas 環境の構築"
 emoji: "📑"
 type: "tech"
 topics: []
-published: false
+published: true
 ---
 
 ![](/images/terraform_logo.png)
@@ -68,7 +68,7 @@ terraform {
 #=================================== 
 provider "aws" {
     region ="ap-northeast-1" //東京リージョンをデフォルトリージョンに 指定。
-    profile = "{ ご自身の認証ユーザ }" // CLI や SDK で API 接続可能な認証ユーザ名 を設定。
+    profile = "{ご自身の認証ユーザ}" // CLI や SDK で API 接続可能な認証ユーザ名 を設定。
                                     // AWS CLI の場合は、aws configure で設定した profile 名。
     default_tags { 
         tags = {
@@ -244,5 +244,6 @@ terraform apply // 設定を適用してリソースを作成
 terraform destroy // index.html の表示が確認出来れば、後片付けで不要 になったリソースを削除 
 ```
 
-- 以下のようにhttp接続ができ、indes.htmlの内容が表示されれば、完了。
+&nbsp;
+- 以下のようにhttp接続が確認でき、index.htmlの内容が表示されれば、完了。
 ![](/images/curl.png)
