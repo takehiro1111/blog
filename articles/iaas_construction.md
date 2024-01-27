@@ -6,7 +6,7 @@ topics: []
 published: false
 ---
 
-![](/images/Terraform_PrimaryLogo_Color_RGB.png)
+![](/images/terraform_logo.png)
 
 # 概要
 - Apache に設定した index.html の内容が表示される事をゴールとして Terraform で AWS 環境を構築する。
@@ -22,11 +22,17 @@ published: false
 ### 構成
   - Apache に設定した index.html の内容が表示される事をゴールとして Terraform で AWS 環境を構築する。
 
+![](/images/iaas.png)
+&nbsp;
+
 ### ファイル配置
   - Terraformは基本的にカレントディレクトリのファイルを認識するため、今回はカレントに使用するファイルを配置。
  　(moduleで分割する場合は、`source`で指定するとディレクトリを超えてTerraformが認識出来るが、今回は用いない。)
 
   - 単一のファイルに全てのコードを纏めて記述すると保守性、視認性、可読性の観点で良くないため、リソースのカテゴリごとに分割して作成しています。 (例:network.tf→VPC,Subnet,インターネットゲートウェイ,ルートテーブル) 
+
+![](/images/tree_1.png)
+&nbsp;
 
 ### 実際のコード
 
@@ -72,10 +78,10 @@ provider "aws" {
 }
 ```
 
-#### locals.tf
+#### local.tf
 - local 変数の設定を記述する。 
 
-```hcl:locals.tf
+```hcl:local.tf
 locals {
     environment = "dev" // リソースを構築するデフォルトの環境を記載
     az = "ap-northeast-1a" // サブネットを設定する AZ を定義
@@ -213,7 +219,8 @@ resource "aws_instance" "test" {
         yum install -y httpd
         systemctl start httpd
         systemctl enable httpd
-        echo "Hello World!" > /var/www/html/index.html EOF
+        echo "Hello World!" > /var/www/html/index.html 
+        EOF
 
     root_block_device {
         volume_type = "gp3" 
@@ -227,14 +234,15 @@ resource "aws_instance" "test" {
     } 
 }
 ```
-
+&nbsp;
 #### Terraformコードのデプロイ
 - ファイルが配置されているカレントディレクトリで下記コマンドを順に実行する。 
 ```none:コマンド
 terraform init // terraform プロジェクトの初期化
-terraform plan // terraform が作成するリソースの一覧を表示して内容が 相違ないか確認
+terraform plan // terraform が作成するリソースの一覧を表示して内容に相違ないか確認
 terraform apply // 設定を適用してリソースを作成
 terraform destroy // index.html の表示が確認出来れば、後片付けで不要 になったリソースを削除 
 ```
 
 - 以下のようにhttp接続ができ、indes.htmlの内容が表示されれば、完了。
+![](/images/curl.png)
