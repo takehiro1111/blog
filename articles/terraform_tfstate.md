@@ -358,6 +358,7 @@ resource "aws_instance" "test" {
 
 ###### コマンドの実行
 - 親モジュールで以下コマンドを実行した際に様子。
+親モジュールと子モジュールの双方の`init`が実行されている事が分かる。
 ```none:コマンド
 terragrunt run-all init
 ```
