@@ -27,7 +27,7 @@
   }
 } */
 
-resource "aws_instance" "test_blog" {
-  ami = "ami-0dafcef159a1fc745"
-  instance_type = "t2.micro"
-}
+# resource "aws_instance" "test_blog" {
+#   ami = "ami-0dafcef159a1fc745"
+#   instance_type = "t2.micro"
+# }
