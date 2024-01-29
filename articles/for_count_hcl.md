@@ -22,7 +22,7 @@ published: false
 # 本編
 
 :::message
-前提:Terraformのインストールやプロバイダとの基本的な設定が完了している状態。
+前提:Terraformのインストールやプロバイダとの基本的な設定が完了している状態である事。
 :::
 
 ## Count

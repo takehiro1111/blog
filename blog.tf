@@ -6,17 +6,17 @@
 // 配列内で要素の位置が変更になると意図しないリソースの削除や修正が発生する。
 
 # count ループ
-variable "test" {
-  type    = list(string)
-  default = ["test_a", "test_b", "test_c"]
-}
-
 resource "aws_iam_user" "test" {
   count = 2
   name  = "test-${count.index}"
 }
 
-// 配列の取り出し方にビルトイン関数を使用した使い方
+# 配列の取り出し方にビルトイン関数を使用した使い方
+variable "test" {
+  type    = list(string)
+  default = ["test_a","test_c"]
+}
+
 resource "aws_iam_user" "test_1" {
   count = length(var.test) //length関数で配列の要素数を返す = 3
   name  = var.test[count.index]
@@ -77,8 +77,113 @@ output "count_instance_arn2" {
   ))
 }
 
-// moduleを用いたバージョン
+# moduleを用いたバージョン
 module "count_ternary_operator_moudle" {
   source                        = "./modules/count_instance/"
   count_ternary_operator_module = true
 }
+
+
+# for_each ループ
+
+variable "map" {
+  type    = map(string)
+  default = {
+    "a" = "map_1", 
+    #"b" = "map_2", 
+    "c" = "map_3"
+  }
+}
+
+resource "aws_iam_user" "test_2" {
+  for_each =  toset(values(var.map)) //values関数で値のみを抜き出し、それをsetに直して重複を除いている。
+  name  = each.value
+  path  = "/each/"
+}
+
+output "iam_user_name_all2" {
+  value = values(aws_iam_user.test_2)[*].name
+  // for_eachだと出力がmap形式になるため、values関数で値のみを抜き出してスプレット形式で配列の全ての要素を取ってくる。
+}
+
+// リソースのコピーにはcountではなく、for_eachを使用するべき。
+// countだと削除時に配列の順番を入れ替わるため、削除対象以外のリソースにも影響が出てしまう。 P146
+// for_eachだとコードの中で1つの要素を削除するとそれのみがさくじょされるだけ(P149)
+
+# module
+module "module_for_each_map" {
+    source = "./modules/for_each/"
+    for_each = toset(values(var.module_map2))
+    user_name = each.value
+}
+
+
+// for_eachでインラインブロックを複数作成する
+variable "module_map2" {
+  type    = map(string)
+  default = {
+    "a" = "module_map_1", 
+    "b" = "module_map_2", 
+    "c" = "module_map_3"
+  }
+}
+
+resource "aws_autoscaling_group" "default" {
+  min_size = 0
+  max_size = 0
+  availability_zones = ["ap-northeast-1a"]
+
+  launch_template {
+    id      = aws_launch_template.foobar.id
+    version = "$Latest"
+  }
+
+  dynamic "tag" {
+    for_each = {
+      for k, v in var.module_map2 : k => upper(v)
+      if k != "a"
+    }
+
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = false
+    }
+  }
+}
+
+# locals {
+#   my_tags = {
+#     Name        = "my-asg"
+#     Component   = "user-service"
+#     Environment = "dev"
+#   }
+# }
+
+resource "aws_launch_template" "foobar" {
+  name_prefix   = "foobar"
+  image_id      = "ami-027a31eff54f1fe4c"
+  instance_type = "t2.micro"
+}
+
+
+# resource "aws_autoscaling_group" "example" {
+#   availability_zones = ["ap-northeast-1a"]
+#   desired_capacity   = 1
+#   max_size           = 1
+#   min_size           = 1
+#   launch_template {
+#     id      = aws_launch_template.foobar.id
+#     version = "$Latest"
+#   }
+
+#   dynamic "tag" {
+#     for_each = local.my_tags
+
+#     content {
+#       key                 = tag.key
+#       value               = tag.value
+#       propagate_at_launch = true
+#     }
+#   }
+# }
