@@ -312,7 +312,7 @@ remote_state {
     backend = "s3"
     
     config = {
-    bucket  = "{任意のバケット名}"
+    bucket  = "terragrunt-test-new"
     key     = "${path_relative_to_include()}.tfstate"
     region  = "ap-northeast-1"
     acl     = "private"
@@ -365,6 +365,7 @@ terragrunt run-all init
 ![](/images/terraform_tfstate/terragrunt_run_all_init.png)
 
 ###### リモートバックエンド(S3)の自動作成の挙動
+- 
 ```none:実行コマンド
 terragrunt run-all init -reconfigure 
 // 既存のステートファイルから未作成のS3バケットを指定し直して同時に作成するために実行
