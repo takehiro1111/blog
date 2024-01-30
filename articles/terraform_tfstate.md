@@ -366,13 +366,13 @@ terragrunt run-all init
 
 ###### リモートバックエンド(S3)の自動作成の挙動
 ```none:実行コマンド
-terragrunt init -reconfigure 
+terragrunt run-all init -reconfigure 
 // 既存のステートファイルから未作成のS3バケットを指定し直して同時に作成するために実行
 ```
 
 ![](/images/terraform_tfstate/terragrunt_make_backend.png)
 
-実際にbackendになるS3バケット設定されている事を確認。
+実際にbackendになるS3バケット設定されている事を`AWS CLI`から確認。
 - 旧バケット:terragrunt-test-old
 - 新バケット:terragrunt-test-new
 
