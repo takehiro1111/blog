@@ -39,7 +39,7 @@ CREATE USER '{ユーザー名}@'{ホスト名}' IDENTIFIED BY '{パスワード}
 
 - 作成したユーザーの確認
 ```
-SHOW user.host FROM mysql.user
+SELECT user.host FROM mysql.user
 ```
 
 # DBやテーブルの作成、参照、消し方
