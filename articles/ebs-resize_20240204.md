@@ -60,7 +60,7 @@ published: true
 - cloud-utilsパッケージに含まれており、主にクラウド環境で動作するインスタンスのディスクサイズの動的な変更をするために利用されます。
 
 ```bash:bash
-sudo growpart /dev/xvda1
+sudo growpart /dev/xvda 1
 ```
 
 #### ②ファイルシステムの拡張
