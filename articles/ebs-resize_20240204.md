@@ -6,18 +6,19 @@ topics: ["aws","EC2","EBS","Linux","インフラエンジニア"]
 published: false
 ---
 
-![](/images/ebs_resize/aws_logo.png)
+![](/images/ebs_resize/aws_logo.png =300x)
 
 ## 記事を書いた経緯
 - エンジニアになって初案件がオンプレからAWSへの移行でその際に対応したのですが、手順をほぼ忘れたなと思いブログに残したいと思ったためです。
 &nbsp;
 
-## 本記事を読み終わった時のゴール
-- EC2インスタンスにアタッチしているEBSボリュームを必要な際にリサイズ出来る事。
+## 目的
+- EC2インスタンスにアタッチしているEBSボリュームのサイズ変更をOS側に適用したい。
 &nbsp;
 
 ## 前提の環境
 - OS:Amazon Linux2
+- ファイルシステム:xfs
 - EC2インスタンスは作成済みでSSHやセッションマネージャーでログインが可能である状態。
 &nbsp;
 
@@ -29,7 +30,7 @@ published: false
 
 ### EBSボリュームサイズの修正
 
-![](/images/ebs_resize/volume_change.png)
+![](/images/ebs_resize/volume_change1.png)
 ![](/images/ebs_resize/modify_volume.png)
 
 - コンソール画面上からEBSボリュームのサイズが変更になっている事を確認。
@@ -39,12 +40,29 @@ published: false
   マウントしているファイルシステムにも反映していく必要があります。
 ![](/images/ebs_resize/shell_after.png)
 
+:::message
+lsblk:OSが認識しているブロックデバイス(HDD,SSD,USB等)を表示するコマンド。
+:::
+
+:::message
+df -hT:ファイルシステムのディスク使用量と利用可能な空き容量を表示するコマンド。-hで人間が読みやすい表示に加工し、-Tでファイルシステムのタイプを表示。
+:::
+&nbsp;
+### サーバーの中で手動での変更
+- OSレベルでのパーティションサイズの変更とファイルシステムの拡張は自動的には行われないため、手動で対応する必要がある。
+
 #### パーティションの拡張
+##### growpartコマンド
+- cloud-utilsパッケージに含まれており、主にクラウド環境で動作するインスタンスのディスクサイズの動的な変更をするために利用されます。
+
 ```bash:bash
 sudo growpart /dev/xvda 1
 ```
 
 #### ファイルシステムの拡張
+##### xfs_growsコマンド
+- XFSファイルシステムを使用しているパーティションのファイルシステムのサイズを拡張するために使用されます。
+- 今回の場合はマウントポイントが`/(ルートファイルシステム)`のため、引数は`/`としています。
 ```bash:bash
 sudo xfs_growfs /
 ```
