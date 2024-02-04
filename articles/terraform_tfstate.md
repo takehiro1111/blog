@@ -28,6 +28,11 @@ published: true
 - Terraformが内部的に使用するプライベートなAPIとして機能する。
 このファイルのマッピング情報を基にAWS等のプロバイダのAPIを呼び出しリソースの作成、修正、削除等を行う。
 
+:::message
+リソースが作成されるまでのイメージ図
+:::
+![](/images/terraform_tfstate/terraform_state_file.png)
+
 #### 何故、必要なのか？
 - 結論としては、Terraformが管理するリソース情報をTerraform自身に識別させるため。
 
