@@ -3,7 +3,7 @@ title: "[AWS/Linux]EBSボリュームのリサイズ方法"
 emoji: "💭"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["aws","EC2","EBS","Linux","インフラエンジニア"]
-published: false
+published: true
 ---
 
 ![](/images/ebs_resize/aws_logo.png =300x)
@@ -25,13 +25,13 @@ published: false
 - EC2インスタンスは作成済みでSSHやセッションマネージャーでログインが可能である状態。
 &nbsp;
 
-## 本編
-### リサイズ前のEBSボリューム
+## AWS Management Console での作業
+### ■リサイズ前のEBSボリューム
 ![](/images/ebs_resize/df_h.png)
 ![](/images/ebs_resize/lsblk.png)
 ![](/images/ebs_resize/ebs_before.png)
 
-### EBSボリュームサイズの修正
+### ■EBSボリュームサイズの修正
 
 ![](/images/ebs_resize/volume_change1.png)
 ![](/images/ebs_resize/modify_volume.png)
@@ -51,7 +51,7 @@ lsblk:OSが認識しているブロックデバイス(HDD,SSD,USB等)を表示�
 df -hT:ファイルシステムのディスク使用量と利用可能な空き容量を表示するコマンド。-hで人間が読みやすい表示に加工し、-Tでファイルシステムのタイプを表示。
 :::
 &nbsp;
-### サーバーの中で手動での変更
+## サーバー(EC2インスタンス) での作業
 - OSレベルでのパーティションサイズの変更とファイルシステムの拡張は自動的には行われないため、手動で対応する必要がある。
 
 #### ①パーティションの拡張
@@ -59,7 +59,7 @@ df -hT:ファイルシステムのディスク使用量と利用可能な空き�
 - cloud-utilsパッケージに含まれており、主にクラウド環境で動作するインスタンスのディスクサイズの動的な変更をするために利用されます。
 
 ```bash:bash
-sudo growpart /dev/xvda 1
+sudo growpart /dev/xvda1
 ```
 
 #### ②ファイルシステムの拡張
@@ -69,19 +69,19 @@ sudo growpart /dev/xvda 1
 ```bash:bash
 sudo xfs_growfs /
 ```
-
+&nbsp;
 :::message
 補足:ファイルシステムが`ext4`の場合
 :::
 - ファイルシステムの生合成をチェック
-
 ```bash:bash
 sudo e2fsck -f /dev/xvda1
 ```
+- ファイルシステムの拡張
 ```bash:bash
 sudo resize2fs /dev/xvda1
 ```
 
 #### ③EBSボリュームのサイズ変更が適用されたか確認
-- /dev/xvda1のサイズが20GBから30GBに増加されているため、変更が適用されている。
+- /dev/xvda1のサイズが20GBから30GBに増加されているため、変更が適用されている事が確認できます。
 ![](/images/ebs_resize/after_all.png)
