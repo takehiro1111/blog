@@ -32,6 +32,7 @@ published: true
 ![](/images/ebs_resize/ebs_before.png)
 
 ### ■EBSボリュームサイズの修正
+- 前提として、ボリュームサイズを減らす事は出来ず増加しか対応していません。
 
 ![](/images/ebs_resize/volume_change1.png)
 ![](/images/ebs_resize/modify_volume.png)
