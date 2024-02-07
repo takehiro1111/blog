@@ -15,7 +15,7 @@ published: false
 musql.server start
 mysql -u root 
 quit / ext
-mysql.server 
+mysql.server stop
 ```
 
 
@@ -37,9 +37,21 @@ DROP TABLE {テーブル名};
 CREATE USER '{ユーザー名}@'{ホスト名}' IDENTIFIED BY '{パスワード}';
 ```
 
-- 作成したユーザーの確認
+- 作成したユーザー,ホスト名の確認
 ```
-SELECT user.host FROM mysql.user
+SELECT user,host FROM mysql.user;
 ```
+
+- ユーザーに権限付与
+```
+Grant ALL PRIVILEGES ON *.* TO 'user1'@'locqhost' ;
+```
+
+- rootユーザにパスワード割り当て 
+```
+ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '新しいパスワード';
+```
+
+
 
 # DBやテーブルの作成、参照、消し方
