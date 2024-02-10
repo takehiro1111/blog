@@ -6,7 +6,7 @@ topics: ["aws","EC2","EBS","Linux","インフラエンジニア"]
 published: true
 ---
 
-![](/images/ebs_resize/aws_logo.png =300x)
+![](/images/ebs_additional/amazon-ebs.png =600x)
 
 ## 記事を書いた経緯
 - エンジニアになって初案件がオンプレからAWSへの移行でその際に対応したのですが、手順をほぼ忘れたなと思いブログに残したいと思ったためです。
