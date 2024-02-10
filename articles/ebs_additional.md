@@ -206,7 +206,7 @@ aws ec2 detach-volume --volume-id ${volume-id2}
 
 - コンソール画面から実施する場合
 ![](/images/ebs_additional/detach_console1.png)
-![](/images/ebs_additional/detach_console1.png)
+![](/images/ebs_additional/detach_console2.png)
 
 :::message alert
 アタッチしていない単体のEBSボリュームにも課金されるため、気になる方はEBSボリュームを削除してください。
