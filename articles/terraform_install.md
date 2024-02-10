@@ -223,6 +223,16 @@ Default output format [None]:<コマンドの実行結果の出力形式 /例:js
 ![](/images/terraform_install/iam_user10.png)
 &nbsp;
 
+:::message
+補足:IAMユーザー経由の場合、terraform側でも認証情報を設定する必要がある
+:::
+```hcl:config.tf
+provider "aws" {
+  region  = "ap-northeast-1" 
+  profile = "{aws configure設定したIAMユーザー名}"       
+}
+```
+&nbsp;
 ## EC2インスタンス(Linux)でIAMロール経由のアクセス
 ##### ①IAM > ロールを作成 > AWSのサービス > EC2を選択 > 「次へ」を押下。
 ![](/images/terraform_install/role1.png)
