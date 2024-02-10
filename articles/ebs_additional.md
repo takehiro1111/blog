@@ -1,5 +1,5 @@
 ---
-title: "[AWS/Linux]EBSボリュームをEC2インスタンスへマウント,アンマウントする方法"
+title: "[AWS/Linux]EBSボリュームをEC2インスタンスへマウントする方法"
 emoji: "🍣"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["aws","EC2","EBS","Linux","Terraform"]
