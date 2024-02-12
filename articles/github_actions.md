@@ -199,14 +199,13 @@ jobs:
         with:
           aws-region: ap-northeast-1
           role-to-assume: arn:aws:iam::{your_aws_account_id}:role/deploy-github-actions # S3アクセス権限を持つIAMロール
-          role-session-name: GitHubActionsSession 
+          role-session-name: GitHubActions_s3_cp 
           #CloudTrailログ等の監査ログでどのセッションがどの操作を行ったのかを追跡するために設定。
 
-      - name: CP bucket list to S3
+     - name: CP bucket list to S3
         id: cp
         working-directory: ./test_s3
         run: |
-          aws s3 ls
           aws s3 mb s3://test-actions-20240211
           aws s3 cp ./ s3://test-actions-20240211 --recursive
           aws s3 ls s3://test-actions-20240211
