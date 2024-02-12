@@ -125,9 +125,6 @@ resource "aws_iam_role" "deploy_github_actions" {
                 Federated = module.oidc.oidc_arn
             },
             Condition = {
-              StringEquals = {
-                "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-              },
               StringLike = {
                 "token.actions.githubusercontent.com:sub" = [
                   "repo:{your_Github_Organizations_name}/{your_repository_name}:*",
