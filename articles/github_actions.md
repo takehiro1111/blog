@@ -5,7 +5,7 @@ type: "tech" # tech: 技術記事 / idea: アイデア
 topics:  ["Terraform","aws","IaC","Github","GithubActions"]
 published: true
 ---
-![](/images/actions_s3/actions_logo.png =550x)
+![](/images/actions_s3/actions_logo.png =450x)
 
 ## 本記事を読み終わった時のゴール
 - GithubActionsでAWS APIに処理するために必要な権限周りの設定を行得る状態。
