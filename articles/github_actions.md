@@ -89,7 +89,7 @@ https://tech.route06.co.jp/entry/2023/06/29/181610
 以下もChatGPT大先生の見解です。
 個人的に納得する材料が欲しかったので見解をいただきました。
 
-`sts.amazonaws.com`は、AWS Security Token Service (STS) のサービスエンドポイントです。
+>`sts.amazonaws.com`は、AWS Security Token Service (STS) のサービスエンドポイントです。
 > AWS STSは、一時的なセキュリティ認証情報を提供するサービスであり、この認証情報はAWSリソースへのアクセスに使用されます。
 > GitHub ActionsからAWSへの認証プロセスでは、GitHub ActionsがOIDCプロバイダとして機能し、AWS STSをクライアントとして利用して一時的なセキュリティ認証情報を発行します。
 > client_id_listにsts.amazonaws.comを含めることで、このOIDCプロバイダ（GitHub Actions）がAWS STSに対して認証情報を提供できることを示しています。
