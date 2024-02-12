@@ -101,7 +101,8 @@ https://tech.route06.co.jp/entry/2023/06/29/181610
 :::message alert
 値は`sts.amazonaws.com`です。
 ポリシーの`Action`要素を書く際の書き方と異なるため、癖で間違えないように注意が必要です。
-私は血迷って少し沼にハマりました。
+私はここで少し沼にハマりました。
+先入観を持ちすぎるのは良くないですね。。
 
 (誤)sts:amazonaws.com
 (正)sts.amazonaws.com
