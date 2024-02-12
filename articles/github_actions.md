@@ -126,9 +126,9 @@ resource "aws_iam_role" "deploy_github_actions" {
             },
             Condition = {
               StringLike = {
-                "token.actions.githubusercontent.com:sub" = [
-                  "repo:{your_Github_Organizations_name}/{your_repository_name}:*",
-                  "repo:{your_Github_user_name}/{your_repository_name}:*",
+                "token.actions.githubusercontent.com:sub":[
+                  "repo:{your_github_organizations}/{your_repository}:*",
+                  "repo::{your_github_account_id}/{your_repository}:*",
                 ]
               }
             }
