@@ -49,7 +49,7 @@ Grant ALL PRIVILEGES ON *.* TO 'user1'@'locqhost' ;
 
 - rootユーザにパスワード割り当て 
 ```
-ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '新しいパスワード';
+ALTER USER 'root'@'%' IDENTIFIED WITH caching_sha2_password BY '新しいパスワード';
 ```
 
 
