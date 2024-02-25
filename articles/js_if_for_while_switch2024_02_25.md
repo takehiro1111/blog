@@ -1,12 +1,15 @@
 ---
-title: "[Javascript]演算子,制御構造(if,switch,while,for)"
+title: "[Javascript]エスケープ文字,演算子,制御構造(if | switch | while | for)"
 emoji: "😺"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["プログラミング","Javascript"]
-published: false
+published: true
 ---
 
-![](/images/js/logo.png)
+![](/images/js/logo.png =400x)
+
+## 記事を書いた目的
+- メイン業務はインフラ周りですが、IaCでTerraformや汎用プログラムでインフラを管理する事もあり、今後を見据えて手始めにJavascriptを学習する事にしました。
 
 ## 本記事を読み終わった時のゴール
 - 基本的なデータ型,演算子の使い方をある程度イメージできること。
@@ -16,7 +19,7 @@ published: false
 
 ## 主な演算子
 
-### 算術演算子
+### ■算術演算子
 - 数学的な計算を行うための演算子。
 
 | 記号| 意味 | 
@@ -28,7 +31,7 @@ published: false
 | % | 剰余 |
 | ** | べき乗 |
 
-### 複合代入演算子
+### ■複合代入演算子
 - 代入と演算を同時に行う際に使用。
 
 | 記号| 意味 | 
@@ -40,7 +43,7 @@ published: false
 | %= | 左辺の値を右辺の値で除算し、その余りを代入。 |
 | **= | 左辺の値を右辺の値で冪乗した結果を代入 |
 
-### 比較演算子
+### ■比較演算子
 - 二つの値を比較し、その結果が真(true)か偽(false)かを返す演算子。
 
 | 記号| 意味 | 
@@ -54,21 +57,24 @@ published: false
 | a <= b | aはb以下 |
 | a => b | aはb以上 |
 
-### 論理演算子
+### ■論理演算子
 - 真（true）と偽（false）の二通りの状態を取る真偽値の間で行われる演算の際に使用される
+
 | 記号| 意味 | 
 | ---- | ---- |
 | a && b | a & b(論理積) |
 | a || b | a or b(論理和) |
 | !a | aがfalseのとき`true`、aがtrueのとき`false` |
 
-### その他
+### ■その他
 - 条件(三項)演算子
+
 | 記号| 意味 | 
 | ---- | ---- |
 | (a == b) ? 1 : 0 | trueなら1,falseなら2を返す |
 
 - null合体演算子
+
 | 記号| 意味 | 
 | ---- | ---- |
 | a ?? b | aがnull or undefined(jsの場合)にbを返す |
@@ -91,7 +97,7 @@ published: false
 &nbsp;
 
 ## 制御構造とは?
-- コードがどの順番で実行されるかを制御するための構文や命令のこと。
+コードがどの順番で実行されるかを制御するための構文や命令のこと。
 以下は、どのプログラミング言語でも共通の概念。
 
 ### 1.順次構造 (Sequential Structure)
@@ -108,7 +114,7 @@ published: false
 &nbsp;
 
 ## 条件分岐
-### if~else
+### ■if~else
 ```js:if_else.js
 let n = 1
 
@@ -121,7 +127,7 @@ else{
 
 ```
 
-### else~if
+### ■else~if
 ```js:else_if.js
 let num = 8;
 
@@ -140,9 +146,9 @@ else{
 
 ```
 
-### その他if文
+### ■その他if文
 - ネストされたif文
-```js
+```js:nest_if.js
 let n1 = "Harry ";
 let n2 = "Potter";
 
@@ -155,7 +161,7 @@ if(n1 === "Harry"){
 ```
 
 - 論理積との組み合わせ
-```js
+```js:and_or.js
 let n3 = "Java";
 let n4 = "Script";
 
@@ -165,9 +171,10 @@ if(n3 === "Java" && n4 === "Script"){
 
 ```
 
-### switch
-- 該当するcaseでbreakによって処理を抜ける。
-```js
+### ■switch
+- caseごとに処理内容を書き、該当するcaseの処理を書く。
+- どのcaseにも当てはまらない場合はdefaltで処理される。
+```js:switch.js
 let num = 3;
         
 switch(num){
@@ -192,9 +199,9 @@ switch(num){
 &nbsp;
 
 ## 繰り返し処理
-### while
+### ■while
 - 通常
-```js
+```js:while.js
 let i = 0
 
 while(i < 3){
@@ -204,7 +211,7 @@ while(i < 3){
 
 ```
 - break
-```js
+```js:while_break.js
 let i = 0;
 // breakによる処理でループを抜ける。(ループを途中停止)
 while(i < 5){
@@ -219,7 +226,7 @@ while(i < 5){
 ```
 
 - continue
-```js
+```js:while_continue.js
 let i = 0;
 
 while(i < 5){
@@ -235,18 +242,19 @@ while(i < 5){
 ```
 
 - 無限
-```js
+```js:while_infinity_loop.js
 et i = 0
 // 無限ループ(ブラウザで表示されないので基本的に使用されない処理)
 while(true){
     document.write(`<p>繰り返し処理中(${i})</p>`);
     i++;
 }
+
 ```
 
-### for文
+### ■for
 - for文の処理をテンプレートリテラルを用いて表示
-```js
+```js:for.js
 for(let i = 0 ; i < 5 ; i++ ){
     document.write(`<p>for文の処理だよ(${i})</p>`);
 }
@@ -254,7 +262,7 @@ for(let i = 0 ; i < 5 ; i++ ){
 ```
 
 - 閏年を表示する処理
-```js
+```js:for_leap_year.js
 // 1900年から2024年までの間で閏年を表示
 for(let i = 1900 ; i <= 2024 ; i++){
     // 第一条件として4で割り切れること
@@ -265,11 +273,12 @@ for(let i = 1900 ; i <= 2024 ; i++){
         }
     }
 }
+
 ```
 
 - for文で素数を表示する処理
 
-```js
+```js:for_prime.js
 for(let n = 2; n <= 100 ; n++){ // 外側のループ。100まで1ずつ増やす。
     let divisors = 0; // 約数として定義する変数の値を0に設定
     
@@ -285,6 +294,7 @@ for(let n = 2; n <= 100 ; n++){ // 外側のループ。100まで1ずつ増や�
         document.writes(`<p>${n}<p/>`) //素数を表示
     }
 }
+
 ```
 &nbsp;
 
