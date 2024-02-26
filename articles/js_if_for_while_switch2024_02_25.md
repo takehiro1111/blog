@@ -174,7 +174,7 @@ if(n3 === "Java" && n4 === "Script"){
 
 ### ■switch
 - caseごとに処理内容を書き、該当するcaseの処理を書く。
-- どのcaseにも当てはまらない場合はdefaltで処理される。
+- どのcaseにも当てはまらない場合は`default`で処理される。
 ```js:switch.js
 let num = 3;
         
