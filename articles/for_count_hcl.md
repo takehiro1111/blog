@@ -71,7 +71,7 @@ output "aws_iam_user" {
 
 ```
 
-```hcl:main.tf
+```hcl:./main.tf
 variable "module_name" {
   type    = list(string)
   default = ["module_user1", "module_user2", "module_user3"]
@@ -112,8 +112,8 @@ resource "aws_instance" "count_ternary_operator2" {
 output "count_instance_arn2" {
   value = one(concat(
     var.count_ternary_operator
-    ? aws_instance.count_ternary_operator[*].arn
-    : aws_instance.count_ternary_operator2[*].arn
+    ? aws_instance.count_ternary_operator[*].arn // trueの場合
+    : aws_instance.count_ternary_operator2[*].arn // falseの場合
   ))
 }
 ```
@@ -143,3 +143,52 @@ module "count_ternary_operator_moudle" {
 }
 ```
 
+## for_each
+- `for_each`を使用すると`list`,`set`,`map`をループしてリソースを複数作成する事が出来る。
+
+### `list`を`set`に変換して作成
+```hcl:variable.tf
+variable "iam_user" {
+  type = list(string)
+  default = [
+    "tanaka",
+    "sato",
+    "suzuki",
+    "tanaka",
+  ]
+}
+
+```
+
+```hcl:security.tf
+resource "aws_iam_user" "user" {
+  for_each = toset(var.iam_user) //setに変換されているので値は重複しない。
+
+  name = each.value
+  path = "/"
+}
+
+```
+
+```hcl
+variable "iam_user_map" {
+  type = map(string)
+  default = {
+    user1 = "tanaka",
+    user2 = "sato",
+    user3 = "suzuki",
+    user4 = "tanaka"
+  }
+}
+
+```
+
+```hcl
+// values関数を用いる事でmapの値を返す。
+// スプラッド式を用いる事で配列のすべての値を取ってくる。
+// キーが重複する場合は、後のキーが上書きする。
+
+output "user_arn" {
+  value = values(aws_iam_user.user)[*].arn
+}
+```
