@@ -148,7 +148,7 @@ scrape_configs:
       - targets: ["{node_exporterのIP}:9100"]
 ```
 
-- PromQLのupメトリクスを確認(Prometheusが正常にメトリクスをスクレイピングできた状態かどうか)
+- PromQLの`up`メトリクスを確認(Prometheusが正常にメトリクスをスクレイピングできた状態かどうか)
   - 値が`1`のためスクレイピング出来ている。(値が`0`なら失敗)
 ![](/images/prometheus_grafana/up.png)
 
