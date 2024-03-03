@@ -1,5 +1,5 @@
 ---
-title: "[Prometheus,Grafana]インストールからログインまで"
+title: "[Prometheus,Grafana]インストール,ログイン,初期設定"
 emoji: "😺"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS","Prometheus","Grafana","監視"]
@@ -109,7 +109,48 @@ systemctl status node_exporter
 デフォルトのポート番号は`9100`のため、SGで穴あけ出来ているか確認する必要あり。
 #### http://{ホスト名}:9100
 ![](/images/prometheus_grafana/node_exporter_login.png)
-&nbsp;
+
+##  `prometheus`から`Node Exporter`のメトリクス確認
+:::message
+予め、`Node Exporter`側のインスタンスのSGルールでprometheus側のインスタンスからのインバウンドアクセスを許可しておく事。
+:::
+
+```bash:/home/ec2-user/prometheus-2.45.3.linux-amd64/prometheus.yml
+# my global config
+global:
+  scrape_interval: 60s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 60s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["localhost:9090"]
+      - targets: ["{node_exporterのIP}:9100"]
+```
+
+- PromQLのupメトリクスを確認(Prometheusが正常にメトリクスをスクレイピングできた状態かどうか)
+  - 値が`1`のためスクレイピング出来ている。(値が`0`なら失敗)
+![](/images/prometheus_grafana/up.png)
 
 
 ## Grafanaのインストール方法
