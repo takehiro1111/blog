@@ -2,7 +2,7 @@
 title: "[Prometheus,Grafana]インストール,ログイン,初期設定"
 emoji: "😺"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["AWS","Prometheus","Grafana","監視"]
+topics: ["AWS","Prometheus","Grafana","EC2","監視"]
 published: true
 ---
 
@@ -188,5 +188,12 @@ systemctl status grafana-server
 
 - ログイン完了
 ![](/images/prometheus_grafana/grafana_login.png)
+
+## GrafanaでPrometheusにDataSourceとして接続
+- GrafanaはPrometheusで収集したメトリクスを可視化,分析するためのツールで内部的にPrometheusと接続する必要がある。
+![](/images/prometheus_grafana/grafana_data_source1.png)
+
+- `Save&test`を押下し`Successfully`の文字が表示されれば設定完了。
+![](/images/prometheus_grafana/grafana_data_source2.png)
 
 ## 完
