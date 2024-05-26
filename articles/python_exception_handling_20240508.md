@@ -1,5 +1,5 @@
 ---
-title: "Pthonの例外処理"
+title: "Pythonの例外処理"
 emoji: "✨"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [Python]
