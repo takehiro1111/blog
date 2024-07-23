@@ -3,7 +3,7 @@ title: "[Python]SAMでLambdaをデプロイしてみた"
 emoji: "🐙"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS","Lambda","Python","SAM","Terraform"]
-published: false
+published: true
 ---
 
 ![](/images/py_logo/python-logo-master-v3-TM.png)
