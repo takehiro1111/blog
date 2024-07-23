@@ -270,7 +270,7 @@ def lambda_handler(event, context):
 
 ```
 
-### ルールの再作成
+### WAFルールの再作成
 ```py
 import boto3
 
@@ -325,9 +325,9 @@ def lambda_handler(event, context):
 
 ```
 
-### eventで渡すデータ
+### eventとして渡すデータ
 
-```json
+```json:get_web_acl.json
 {
   "WebACL": {
       "Name": "example-web-acl",
