@@ -411,11 +411,11 @@ Setting default arguments for 'sam deploy'
 ```
 - デプロイ後に手動で呼び出す際のコマンド
 ```zsh
-sam remote invoke DeleteWAFRuleFunction --event get_web_acl.json --stack-name waf-rule --region ap-northeast-1
+sam remote invoke DeleteWAFRuleFunction --event-file get_web_acl.json --stack-name waf-rule --region ap-northeast-1
 ```
 
 ```zsh
-sam remote invoke CreateWAFRuleFunction --event get_web_acl.json --stack-name waf-rule --region ap-northeast-1
+sam remote invoke CreateWAFRuleFunction --event-file get_web_acl.json --stack-name waf-rule --region ap-northeast-1
 ```
 
 ## 参考
