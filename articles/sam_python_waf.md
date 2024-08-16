@@ -11,7 +11,7 @@ published: true
 &nbsp;
 
 ## 要件
-![](/images/waf_rule/waf_rule_auto.png)
+![](/images/waf_rule/waf_rule_auto2.png)
 - アプリ審査時にWAFの地域制限のルールを外したい。
   この作業を開発チームで完結させたいため、Terraform等のインフラ寄りのツールではなく、
   開発側に馴染みのあるLambda関数を用いて実現したい。
