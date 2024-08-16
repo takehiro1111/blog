@@ -94,5 +94,10 @@ print(sorted_products)
 ```
 
 ```shell:result
-[{'name': 'Laptop', 'price': 1200}, {'name': 'Tablet', 'price': 1200}, {'name': 'Phone', 'price': 800}, {'name': 'Monitor', 'price': 300}]
+[
+  {'name': 'Laptop', 'price': 1200}, 
+  {'name': 'Tablet', 'price': 1200}, 
+  {'name': 'Phone', 'price': 800}, 
+  {'name': 'Monitor', 'price': 300}
+]
 ```
