@@ -1,5 +1,5 @@
 ---
-title: "[Python]SAMでLambdaをデプロイしてみた"
+title: "[Python]SAMでWAFの特定ルールを削除、作成するLambdaをデプロイしてみた"
 emoji: "🐙"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS","Lambda","Python","SAM","Terraform"]
@@ -10,10 +10,15 @@ published: true
 
 &nbsp;
 
-## 記事を書く経緯
-- 業務で特定のWAFルールの削除、再作成を自動化するというタスクがあり自身のメモとしての記事です。
-GithubActionsでの対応も検討していますが、一旦以下のようにSAMを用いたAWS Lambdaで対応しようと考えています。
-コード自体もまだまだ改善の余地があるのですが、途中経過で備忘録として残すために公開しているため適宜修正します。
+## 要件
+![](/images/waf_rule/waf_rule_auto.png)
+- アプリ審査時にWAFの地域制限のルールを外したい。
+  この作業を開発チームで完結させたいため、Terraform等のインフラ寄りのツールではなく、
+  開発側に馴染みのあるLambda関数を用いて実現したい。
+  &nbsp;
+
+- 現状は開発チームとSRE間で適宜コミュニケーションを取りながら対応しているが、
+非同期でも共通認識を持てるようにするために処理完了後にSlack通知する。
 
 ## 前提
 1. SAM CLIをインストール済みであること。
