@@ -41,6 +41,7 @@ Sun
 
 &nbsp;
 ### ラムダを使用する場合
+- 関数で2行記載していた内容を省略できて引数に直接定義出来る。
 ```py
 def basic(list_args,context):
   for list_arg in list_args:
