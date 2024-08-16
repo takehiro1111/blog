@@ -3,7 +3,7 @@ title: "【Python】クロージャ-の挙動"
 emoji: "🐙"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Python","クロージャー"]
-published: false
+published: true
 ---
 
 ## 1.クロージャーとは？
