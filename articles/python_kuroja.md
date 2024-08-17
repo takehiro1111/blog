@@ -1,5 +1,5 @@
 ---
-title: "【Python】クロージャ-の挙動"
+title: "【Python】クロージャーの挙動"
 emoji: "🐙"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Python","クロージャー"]
