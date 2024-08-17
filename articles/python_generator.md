@@ -3,7 +3,7 @@ title: "[Python]ジェネレーターの概念、挙動"
 emoji: "👻"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: []
-published: false
+published: true
 ---
 ![](/images/py_logo/python-logo-master-v3-TM.png)
 ## 1.ジェネレーターとは？
