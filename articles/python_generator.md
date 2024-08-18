@@ -90,6 +90,30 @@ for num in create_generator():
 10
 ```
 
+- 以下ではnext関数を用いて逐次処理のイメージが湧きやすいように書いている。
+  - リストだと要素が一括で処理されるが、ジェネレーターを用いることで必要な分のみ処理をすることも可能。
+
+```py
+def create_generator():
+  for i in range(1,11):
+    yield i
+
+gen = create_generator()
+print(next(gen))
+print(next(gen))
+print(next(gen))
+print(next(gen))
+print(next(gen))
+```
+
+```shell:result
+1
+2
+3
+4
+5
+```
+
 ### ジェネレーター式
 - 以下のような書き方でも同じ結果を得られる。
   - リスト内包表記の`[]`を`()`に置き換えることで、簡潔にジェネレーターを作成できる。
