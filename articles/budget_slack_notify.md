@@ -11,7 +11,8 @@ published: true
 - terraformにおけるprovider等の準備段階で必要な設定の記載は省略しています。
 
 ## 要件
-- AWSの月次使用金額の状況を把握したいため閾値を設定し、超過した場合はSlackへアラート通知を行いたい。
+- AWSの月次使用金額の状況を把握したい.
+- 段階ごとに設定したBudgetの閾値を超過した場合はSlackへアラート通知を行いたい。
 
 ## 構成
 ![](/images/alert/budget_slack_notify.png)
