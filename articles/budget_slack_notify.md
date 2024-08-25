@@ -116,7 +116,7 @@ resource "aws_sns_topic_policy" "slack_alert" {
 https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_policy
 
 ### Chatbot
-- Chatbotの権限は、ガードレールポリシーの範囲内でiAMロールで設定した権限を行使する事が出来る。
+- Chatbotの権限は、ガードレールポリシーの範囲内でIAMロールで設定した権限を行使する事が出来る。
 
 ```hcl:chatbot.tf
 locals {
