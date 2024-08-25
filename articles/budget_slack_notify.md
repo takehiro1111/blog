@@ -116,7 +116,7 @@ resource "aws_sns_topic_policy" "slack_alert" {
 https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_policy
 
 ### Chatbot
-- CHatbotとslackのワークスペースを紐づける設定を別途コンソール画面から行う必要がある。(以下へ記載)
+- Chatbotの権限は、ガードレールポリシーの範囲内でiAMロールで設定した権限を行使する事が出来る。
 
 ```hcl:chatbot.tf
 locals {
@@ -152,6 +152,50 @@ resource "awscc_chatbot_slack_channel_configuration" "notify_slack" {
 ```
 
 https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/chatbot_slack_channel_configuration
+
+- Chatbotに設定するIAMロール
+```hcl:iam.tf
+resource "aws_iam_role" "chatbot" {
+  name                  = "AWSChatbot-role"
+  description           = "AWS Chatbot Execution Role"
+  path                  = "/service-role/"
+  force_detach_policies = false
+  max_session_duration  = 3600
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "chatbot.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# 想定外のエラーにならないよう、デフォルトのテンプレートポリシーに沿った設定しているためワイルドーカードで定義している。
+#tfsec:ignore:aws-iam-no-policy-wildcards
+data "aws_iam_policy_document" "chatbot" {
+  statement {
+    actions = [
+      "cloudwatch:Describe*",
+      "cloudwatch:Get*",
+      "cloudwatch:List*"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "chatbot" {
+  name   = aws_iam_role.chatbot.name
+  role   = aws_iam_role.chatbot.name
+  policy = data.aws_iam_policy_document.chatbot.json
+}
+```
 
 &nbsp;
 ## SlackワークスペースとChatbotの関連付け
