@@ -24,6 +24,7 @@ https://dev.classmethod.jp/articles/ecs-task-stop-reason-slack-notification/
 
 ### 今回設定するカスタマイズの通知イメージ
   - 停止コードや理由の記載により、デフォルトの通知内容と比較して現状把握しやすくなったと思います。
+  - 細かい通知項目やUIはお好みでカスタマイズして下さい。
 ![](/images/event_bridge/customize_notify.png)
 
 ## 3.各サービスのコード
