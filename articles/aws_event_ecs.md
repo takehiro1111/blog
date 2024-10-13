@@ -1,5 +1,5 @@
 ---
-title: "Terraformを使ったECS停止時のカスタム通知の実装"
+title: "Terraformを使ったECS停止時のカスタムSlack通知の実装"
 emoji: "😎"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS","EventBridge","ECS","Chatbot","Terraform"]
