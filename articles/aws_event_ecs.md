@@ -39,7 +39,7 @@ https://dev.classmethod.jp/articles/ecs-task-stop-reason-slack-notification/
 resource "aws_cloudwatch_event_rule" "ecs_event" {
   state       = "ENABLED"
   name        = "ecs-event-notify"
-  description = "${local.env} ecs alert notification rule"
+  description = "ecs alert notification rule"
   event_bus_name = "default"
 
   event_pattern = <<END
