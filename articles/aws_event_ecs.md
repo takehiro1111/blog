@@ -123,7 +123,7 @@ data "aws_iam_policy_document" "sns_notify_chatbot" {
     }
     actions = ["sns:Publish"]
     resources = [
-      "arn:aws:sns:ap-northeast-1:${data.aws_caller_identity.current.account_id}:slack_notify"
+      "arn:aws:sns:ap-northeast-1:${アカウントID}:slack_notify"
     ]
   }
 }
