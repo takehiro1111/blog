@@ -35,6 +35,7 @@ https://dev.classmethod.jp/articles/ecs-task-stop-reason-slack-notification/
 - 停止理由のフィルターは行わず、ECSが停止した際に広くキャッチするようなルール設定にしています。
 - `input_transformer`ブロックを使って停止時の詳細情報（例えば、停止理由やエラーコード）を通知に含めるようにしています。これにより、AWSコンソールを開かなくても情報を一目で確認できるようになりました。
 - `ECS task state change`イベントの中身：https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_task_events.html
+- `DescribeTasks API`: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTasks.html
 ```hcl
 resource "aws_cloudwatch_event_rule" "ecs_event" {
   state       = "ENABLED"
