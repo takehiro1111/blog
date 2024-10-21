@@ -1,5 +1,5 @@
 ---
-title: "TerraformをRenovateで自動バージョン管理し、PR作成とMergeを自動化する"
+title: "TerraformをRenovateで自動バージョンアップし、PR作成とMergeを自動化する"
 emoji: "🐡"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Renovate","Terraform"]
