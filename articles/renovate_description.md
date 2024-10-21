@@ -8,7 +8,7 @@ published: true
 
 ![](/images/renovate/renovate_logo.png)
 
-## Renovateとは？
+## 1.Renovateとは？
 - ドキュメントで`Automated dependency updates. Multi-platform and multi-language.`と記載されています。
 簡潔に言うと依存関係を自動で更新してくれるツールです。
 バージョンアップしてくれ、PR作成~Mergeまで自動で行ってくれます。
@@ -16,7 +16,7 @@ published: true
 reference:https://docs.renovatebot.com/
 :::
 
-# Dependabotとの比較
+# 2.Dependabotとの比較
 ### Renovateを採用するメリット
   - Renovateだと異なる種類の依存関係でも、プロジェクト単位で1つのPRにまとめてくれてPRの数が少なくなり管理が容易になる。
     - Dependabotだと同じ種類の依存関係でもPRが分離されPR数が多くなってしまい管理がしにくい。
@@ -25,7 +25,7 @@ reference:https://docs.renovatebot.com/
   - テストやレビューが不要な場合、PRの作成からマージまでを完全に自動化できる。(DependabotだとCIをセットにしないとMergeまでやってくれない)
     - Dependabotは、更新後のコードがプロジェクトで正常に動作することを確認するためにCIでテストを実行する必要があるため。
 
-# 前提
+# 3.前提
 - RenovateとGithubが連携済みであること
 https://github.com/apps/renovate
 ![](/images/renovate/alignment_github_full.png)
@@ -35,12 +35,12 @@ reference:https://qiita.com/ksh-fthr/items/40732b6396f36c62bea2
 :::
 
 
-# `renovate.json`の配置
+# 4.`renovate.json`の配置
 - 基本的にはリポジトリの`ルートディレクトリ` or `.github`配下に配置します。  
 ルートディレクトリが最優先されるので、特別に理由がない場合はルートディレクトリに配置します。
 ![](/images/renovate/doc_dir.png)
 
-# コードとパラメータの解説
+# 5.コードとパラメータの解説
 - バージョンアップしたい対象
   - terraformブロック
   - `.terraform-verison`ファイル
