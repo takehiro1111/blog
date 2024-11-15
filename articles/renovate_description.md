@@ -51,6 +51,11 @@ reference:https://qiita.com/ksh-fthr/items/40732b6396f36c62bea2
   - Terraformのバージョン更新を自動で管理し、PR作成からMergeまでを自動化
   - 個人用のリポジトリのため、更新優先のためメジャーバージョンも対象
 
+- 備考
+  - 今回はCIテストをしなくても自動マージされるよう設定。
+  - RenovateのApprove用Botにレビュアーを対応させる。
+  - 個人用のリポジトリのため、Majorバージョンも自動マージに対照しています。(業務であればMajorはレビューする必要あります。)
+
 ```json:takehiro1111/aws_terraform/renovate.json
 // reference: https://docs.renovatebot.com/configuration-options/#additionalbranchprefix
 {
@@ -66,16 +71,16 @@ reference:https://qiita.com/ksh-fthr/items/40732b6396f36c62bea2
   "schedule": [
     "* 8-23,0-2 * * *"
   ],
-  "assignAutomerge": true,
-  "assignees": [
-    "takehiro1111"
-  ],
+  "assignAutomerge": false,
   "autoApprove": true,
-  "automerge":true,
-  "automergeType":"pr",
-  "automergeStrategy":"auto",
-  "rebaseWhen": "conflicted",
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "auto",
+  "rebaseWhen": "auto",
   "dependencyDashboard": true,
+  "ignoreTests": true,
+  "ignoreReviewers": ["takehiro1111"],
+  "reviewers": ["Renovate Approve[bot]","Renovate Approve 2[bot]"],
   "packageRules": [
     {
       "matchManagers": ["terraform", "terraform-version", "tflint-plugin"],
@@ -86,6 +91,7 @@ reference:https://qiita.com/ksh-fthr/items/40732b6396f36c62bea2
     }
   ]
 }
+
 ```
 
 ### 上記コードの結果、バージョン更新を行いPR作成〜Mergeまで自動化される。
