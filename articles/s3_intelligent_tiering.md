@@ -113,7 +113,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "example" {
       noncurrent_days = 30 // オブジェクトが非現行バージョンになってから、アクション（削除や移行）が実行されるまでの日数
     }
     transition {
-      days          = 0 // オブジェクトが格納されて24h以内にIntelligent-Tireringへ移行
+      days          = 0 // オブジェクトが格納されて24h以内にIntelligent-Tierringへ移行
       storage_class = "INTELLIGENT_TIERING"
     }
   }
@@ -122,7 +122,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "example" {
 // ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_intelligent_tiering_configuration
 resource "aws_s3_bucket_intelligent_tiering_configuration" "example" {
   bucket = {バケット名}
-  name   = "Intelligent-Tirering-Archive-Option"
+  name   = "Intelligent-Tiering-Archive-Option"
 
   tiering {
     access_tier = "ARCHIVE_ACCESS"
@@ -141,7 +141,7 @@ resource "aws_s3_bucket_intelligent_tiering_configuration" "example" {
   # aws_s3_bucket_lifecycle_configuration
   lifecycle_rule = [
     {
-      id = "intelligent-tireling"
+      id = "intelligent-tieling"
       status = "Enabled"
       filter = {
         object_size_greater_than = 131072
