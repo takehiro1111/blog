@@ -17,7 +17,7 @@ published: true
   - 各階層に移行後オブジェクトがアクセスされると、そのオブジェクトは S3 Intelligent-Tiering によって自動的に高頻度のアクセス階層に戻される。
 
 ### 1-3.Intelligent-Tieringへの移行期間
-  - 最短0日から設定可能
+  - **最短0日**から設定可能
 
 ### 1-4.アクセス階層([参照](https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/intelligent-tiering-overview.html))
 
