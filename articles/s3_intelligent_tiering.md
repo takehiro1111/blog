@@ -73,7 +73,7 @@ published: true
 | ディープアーカイブアクセス階層 | 12 h以内 |
 
 ### 3-3.移行パス([参照](https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/lifecycle-transition-general-considerations.html#lifecycle-general-considerations-transition-sc))
-  - 既に**One Zone-IA**や**Glacier**のバケットからは、Intelligent-tieringへ移行できない。
+  - **One Zone-IA**や**Glacier**のバケットからは、Intelligent-tieringへ移行できない。
   ![](/images/s3_tier/life_cycle_pass.png)
 
 &nbsp;
