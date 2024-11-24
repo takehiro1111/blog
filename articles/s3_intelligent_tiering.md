@@ -187,6 +187,8 @@ https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_b
 
 https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/lifecycle-transition-general-considerations.html#lifecycle-general-considerations-transition-sc
 
+https://aws.amazon.com/jp/about-aws/whats-new/2021/11/s3-intelligent-tiering-archive-instant-access-tier/
+
 https://www.slideshare.net/slideshow/20190220-aws-black-belt-online-seminar-amazon-s3-glacier/133346950#45
 
 https://zenn.dev/chonan_kai/articles/28911c85e05cfc
