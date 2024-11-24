@@ -5,6 +5,8 @@ type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS","S3","Terraform"]
 published: true
 ---
+![](/images/s3_tier/s3.png =300x)
+
 ## 0.本記事を書いている経緯
 - 業務でS3周りのコスト削減の一環として**S3 Intelligent-Tierring**の設定を行う予定だが、その前段階で導入に必要なコストや懸念点を調査している。  
 その過程で自身の備忘録として残しています。
