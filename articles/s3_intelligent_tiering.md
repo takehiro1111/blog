@@ -1,5 +1,5 @@
 ---
-title: "S3 Intelligent-Tieringの説明とTerraformでの実装"
+title: "S3 Intelligent-Tiering:概要とTerraformでの実装"
 emoji: "📌"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS","S3","Terraform"]
