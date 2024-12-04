@@ -105,9 +105,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "example" {
     id = "Allow small object transitions in INTELLIGENT_TIERING"
     status = "Enabled"
 
-    filter {
-      object_size_greater_than = 131072 # /バイト単位 / (128KB)  128KB未満のオブジェクトはアクセス頻度の確認が対象外のため。
-    }
     noncurrent_version_expiration {
       newer_noncurrent_versions = 3 // 非現行バージョンを3世代保持。それ以前の古いバージョンは削除される。
       noncurrent_days = 30 // オブジェクトが非現行バージョンになってから、アクション（削除や移行）が実行されるまでの日数
@@ -143,9 +140,6 @@ resource "aws_s3_bucket_intelligent_tiering_configuration" "example" {
     {
       id = "intelligent-tieling"
       status = "Enabled"
-      filter = {
-        object_size_greater_than = 131072
-      }
       noncurrent_version_expiration = {
         newer_noncurrent_versions = 3
         noncurrent_days           = 30
