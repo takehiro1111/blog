@@ -276,4 +276,14 @@ systemctl status grafana-server
 - `Save&test`を押下し`Successfully`の文字が表示されれば設定完了。
 ![](/images/prometheus_grafana/grafana_data_source2.png)
 
+## 補足
+- 大分省略してますが、こんな感じのダッシュボードが見れます。
+### node exporter
+https://grafana.com/ja/grafana/dashboards/1860-node-exporter-full/
+![](/images/prometheus_grafana/node_full.png)
+
+### blackbox exporter
+https://grafana.com/grafana/dashboards/13659-blackbox-exporter-http-prober/
+![](/images/prometheus_grafana/blackbox.png)
+
 ## 完
