@@ -153,6 +153,86 @@ scrape_configs:
 ![](/images/prometheus_grafana/up.png)
 
 
+## Blackbox Exporterのインストール方法
+- インストールコマンド
+  - Prometheus,Grafanaをインストールしているサーバーが対象
+```bash
+# ref: https://prometheus.io/download/
+wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.25.0/blackbox_exporter-0.25.0.linux-amd64.tar.gz
+```
+
+- 圧縮ファイルの解凍
+```bash
+tar -zxvf blackbox_exporter-0.25.0.linux-amd64.tar.gz
+```
+
+- blackbox expoeterのデフォルト設定ファイルの作成
+```bash
+# ref: https://github.com/prometheus/blackbox_exporter/blob/master/example.yml
+modules:
+  http_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: []  # Defaults to 2xx
+      method: GET
+      preferred_ip_protocol: "ip4" # defaultはipv6のため修正する。
+```
+
+- `systemd`でBlackboxExporterを制御するためにサービスユニットファイルを作成
+```bash:/etc/systemd/system/blackbox_exporter.service
+[Unit]
+Description=Prometheus Server
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+[Service]
+User=root
+Restart=on-failure
+ExecStart=/home/{your_dir_pass}/blackbox_exporter-0.25.0.linux-amd64/blackbox_exporter --config.file=/home/{your_dir_pass}/blackbox_exporter-0.25.0.linux-amd64/monitor_website.yml
+[Install]
+WantedBy=multi-user.target
+```
+- systemdに変更を認識させるためにデーモンを更新
+```bash
+sudo systemctl daemon-reload
+```
+
+- サービスの起動設定
+```bash
+sudo systemctl start blackbox_exporter
+sudo systemctl enable blackbox_exporter
+systemctl status node_exporter
+```
+
+### prometheus側の設定ファイル変更
+- 監視したいURLに関する設定を追記する。
+- EC2インスタンスに関連づけているSGで9115番ポートにアクセスできるようInboundeで自身のIPを許可する。
+```bash:~/prometheus-2.53.3.linux-amd64/prometheus.yml
+### 追加分を抜粋
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a HTTP 200 response.
+    static_configs:
+      - targets:
+        - https://twitter.com/ # 監視したいURLを記載する。
+        - https://www.youtube.com/
+        - https://www.instagram.com/
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115  # The blackbox exporter's real hostname:port.
+```
+
+- Prometheusサービスの再起動
+```bash
+sudo systemctl restart prometheus
+```
+
 ## Grafanaのインストール方法
 ![](/images/prometheus_grafana/grafana-logo.png) 
 - インストールコマンド
