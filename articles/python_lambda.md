@@ -68,6 +68,60 @@ Sat
 Sun
 ```
 &nbsp;
+
+## map関数の使い方
+- イテラブル（リストやタプルなど）のすべての要素に組み込み関数やlambda（ラムダ式、無名関数）、defで定義した関数などを適用できる。
+- 第一引数に適用する関数（呼び出し可能オブジェクト）、第二引数にリストなどのイテラブルオブジェクトを指定
+```py
+l = [-3,-2,-1,0]
+
+print(map(abs,l))  # <map object at 0x102b8e680>
+print(type(map(abs, l))) # <class 'map'>
+print(list((map(abs,l)))) # [3, 2, 1, 0]
+
+l_str = ['Tokyo','Osaka']
+print(list(map(len,l_str))) # [5, 5]
+
+
+for i in map(abs,l):
+  print(i) # 3 2 1 0
+
+# mapとlambdaの組み合わせ
+print(list(map(lambda x : x ** 2,l))) # [9, 4, 1, 0]
+print
+
+# mapとdefの関数を組み合わせ
+def test(x):
+  return x ** 2
+
+print(list(map(test,l))) # [9, 4, 1, 0]
+
+## 複数のイテラブルを引数に指定
+
+t_1 = (1,2,3)
+t_2 = (10,20,30)
+
+print(tuple(map(lambda x,y : x * y, t_1,t_2))) # (10, 40, 90)
+print([x * y for x,y in zip(t_1,t_2)]) # (10, 40, 90)
+```
+
+### numpyを用いた書き方
+```py
+import numpy as np
+
+a = np.array([-2, -1, 0])
+print(np.abs(a))
+# [2 1 0]
+
+print(a**2)
+# [4 1 0]
+
+a_1 = np.array([1, 2, 3])
+a_2 = np.array([10, 20, 30])
+print(a_1 * a_2)
+# [10 40 90]
+```
+
 ## 少し応用的な使い方
 - ラムダを用いて複数処理を実行する。
 ```py
