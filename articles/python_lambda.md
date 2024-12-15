@@ -9,7 +9,10 @@ published: true
 
 ## Pythonの書き方におけるラムダとは？
 - 一行で短い関数を定義できるような書き方。
+- 無名関数と呼ばれ、関数名を定義せず簡潔に関数として定義できる記法。
 - 特に関数を一度しか使わない場合や、非常に単純な処理を行う場合にコードを簡潔に保てる。
+- 記法 -> `lambda 引数1, 引数2, ..., 引数n: 式`
+  - 通常の関数でのreturnやリスト内包表記と異なり、実際に返る値は明示的に記載しない。
 
 ## 基本的なコード例
 
@@ -42,12 +45,14 @@ Sun
 &nbsp;
 ### ラムダを使用する場合
 - 関数で2行記載していた内容を省略できて引数に直接定義出来る。
+- 以下の例では便宜的にprintを使用している。
+  - returnは「関数の実行を終了し、値を呼び出し元に返す」ため、ループが途中終了してしまうため。
 ```py
 l = ["Mon","tue","wed","Thu","fri","Sat","sun"]
 
 def basic(list_args,context):
   for list_arg in list_args:
-    print(context(list_arg))
+    return context(list_arg)
 
 basic(l,lambda list_arg: list_arg.capitalize())
 
