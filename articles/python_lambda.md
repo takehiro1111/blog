@@ -24,7 +24,7 @@ def basic(list_args,context):
 
 # 複数の処理を行う場合は、更に関数を追記する必要がある。
 def sample_basic(list_arg):
-    return list_arg.capitalize() # 文字を大文字にし、残りを小文字に変換するメソッド
+    return list_arg.capitalize() # 頭文字を大文字にし、残りを小文字に変換するメソッド
 
 basic(l,sample_basic)
 ```
@@ -43,6 +43,8 @@ Sun
 ### ラムダを使用する場合
 - 関数で2行記載していた内容を省略できて引数に直接定義出来る。
 ```py
+l = ["Mon","tue","wed","Thu","fri","Sat","sun"]
+
 def basic(list_args,context):
   for list_arg in list_args:
     print(context(list_arg))
