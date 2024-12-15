@@ -1,5 +1,5 @@
 ---
-title: "【Python】ラムダの書き方、使用例(AWSのLambda関数ではない)"
+title: "【Python】ラムダ式関数（無名関数）
 emoji: "🙌"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Python","ラムダ"]
