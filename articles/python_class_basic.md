@@ -196,20 +196,24 @@ class MyClass:
     def show_class_var(cls):
         print(cls.class_var)
 
-cs = MyClass()
+cs = MyClass
 cs.show_class_var() # 100
 ```
 
 #### @staticmethod
 - 引数に`self`や`cls`を取らず、クラスやインスタンスには一切依存しない純粋な関数として振る舞う。（クラス名で呼び出せるただの関数的なイメージ）
 - 機能的にはクラスの名前空間に置かれた通常の関数と同様だが、クラスに関連した処理を論理的にまとめるために使われる。
-  - あまり通常の関数と変わらないが、MyClass.add(1, 2)と呼べることで、MyClassに関連する操作として意味的にまとめておくことができる。
 
 ```py
-class MyClass:
-    @staticmethod
-    def add(a, b):
-        return a + b
+class Person(object):
+  def __init__(self):
+    self.t = 30
+
+  @staticmethod
+  def birthday(year):
+    print('私の誕生日は{}です。'.format(year))
+
+Person.birthday('3月')
 ```
 
 
