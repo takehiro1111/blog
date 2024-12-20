@@ -1,5 +1,5 @@
 ---
-title: "[Python]`@dataclass`の使い方"
+title: "[Python]@dataclassの使い方"
 emoji: "🎃"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["python"]
