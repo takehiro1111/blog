@@ -1,9 +1,9 @@
 ---
-title: ""
+title: "[Python]`@dataclass`の使い方"
 emoji: "🎃"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: []
-published: false
+topics: ["python"]
+published: true
 ---
 ![](/images/py_logo/python-logo-master-v3-TM.png)
 
