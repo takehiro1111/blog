@@ -156,7 +156,7 @@ class User(object):
 
 user = User('suzuki',20)
 result = asdict(user)
-print(result)
+print(result) # {'name': 'suzuki', 'age': 20}
 
 ```
 
