@@ -2,7 +2,7 @@
 #Terraform block
 #===================================
 terraform {
-  required_version = "1.6.5" //使用するterraformのバージョンを設定
+  required_version = "1.10.3" //使用するterraformのバージョンを設定
   required_providers {
     aws = {
       source  = "hashicorp/aws" //プロバイダーとしてAWSを使用する事を明示的に設定
