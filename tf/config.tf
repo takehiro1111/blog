@@ -6,7 +6,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws" //プロバイダーとしてAWSを使用する事を明示的に設定
-      version = "5.30.0"
+      version = "5.82.2"
     }
   }
 
