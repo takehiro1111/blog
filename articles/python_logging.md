@@ -326,6 +326,13 @@ logger.error("This is an error message.")
 
 ```
 
+### 出力
+```zsh
+[DEBUG] main.py -> This is a debug message.
+[WARNING] main.py -> This is a warning message.
+[ERROR] main.py -> This is an error message.
+```
+
 ## 参考
 https://docs.python.org/ja/3/library/logging.html#logrecord-attributes
 https://docs.python.org/ja/3/library/logging.config.html
