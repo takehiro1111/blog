@@ -18,6 +18,10 @@ published: true
 - logの重大度 (severity) 別にメッセージを表示できます。
   - セットしたレベル以上の重大度に該当するログが表示されます。
 
+- カスタマイズする場合
+  - 小規模プロジェクトでは、以下のようにbasicConfig を活用するだけでも十分です。
+  - 大規模なプロジェクトでは、後述するJSON 設定やカスタムハンドラーを活用することで柔軟性が向上します。
+
 ```py
 import logging
 
@@ -26,7 +30,7 @@ logging.basicConfig(encoding='utf-8', level=logging.INFO)
 logging.critical('crit')
 logging.error('error')
 logging.warning('warn')
-logging.info(f'info:{'tutorial'}')
+logging.info(f"info:{'tutorial'}")
 logging.debug('debug')
 
 # CRITICAL:root:crit
@@ -38,6 +42,7 @@ logging.debug('debug')
 ## フォーマッター
 - ログの出力形式を定義します。
   - [ドキュメント](https://docs.python.org/ja/3/library/logging.html#logrecord-attributes)に属性の説明が記載されています。
+  - フォーマッターを使うことで、ログの見やすさを改善し、デバッグ効率を向上できます。
 ```py
 import logging
 
@@ -250,6 +255,7 @@ logger.warning("password = 'xxxx'")
 ```zsh
 2024-12-22 11:49:10,951 - example_logger - DEBUG - This is a debug message
 2024-12-22 11:49:10,951 - example_logger - INFO - This is an info message
+
 # フィルターに合致する"password = 'xxxx'"が出力されない。
 ```
 
@@ -257,6 +263,13 @@ logger.warning("password = 'xxxx'")
 - 予めloggingの設定を切り出し、rootモジュールで呼び出せる。
   - コード量の削減による可読性の向上
   - 疎結合による保守性の向上
+
+```shell:ディレクトリ構造
+project/
+├── main.py
+├── logging.json
+├── filter.py
+```
 ```py:./logging.json
 {
   "version": 1,
@@ -304,8 +317,7 @@ import logging
 class LogFilter(logging.Filter):
     def __init__(self, words=None):
         super().__init__()
-        l = []
-        self.words = words or l
+        self.words = words or []
 
     def filter(self, record):
         # メッセージに特定の単語が含まれている場合は False を返す
