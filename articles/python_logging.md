@@ -84,7 +84,7 @@ logger.critical('緊急事態です。')
 # 2024-12-22 10:34:38,941 - (main.py) - [CRITICAL] - 緊急事態です。
 ```
 
-- 他モジュールのログ設定をimport
+### 他モジュールのログ設定をimportする場合
 ```py:main.py
 import logging
 import sub
@@ -100,11 +100,6 @@ logger.info('mainのロガー出力(info)')
 # invoke sub module
 sub.sub_log_func()
 
-# mainで他モジュールのログを出力する際の例。
-# 2024-12-22 10:47:13,872 - (main.py) - [INFO] - mainのロガー出力(info)
-# 2024-12-22 10:47:13,872 - (sub.py) - [INFO] - サブファイルのロギング設定です。
-# 2024-12-22 10:47:13,872 - (sub.py) - [ERROR] - サブファイルのロギング設定のエラーです。
-
 ```
 
 ```py:sub.py
@@ -117,6 +112,15 @@ logger.setLevel(logging.DEBUG)
 def sub_log_func():
   logger.info('サブファイルのロギング設定です。')
   logger.error('サブファイルのロギング設定のエラーです。')
+```
+
+- 出力
+```zsh
+python main.py
+
+2024-12-22 10:47:13,872 - (main.py) - [INFO] - mainのロガー出力(info)
+2024-12-22 10:47:13,872 - (sub.py) - [INFO] - サブファイルのロギング設定です。
+2024-12-22 10:47:13,872 - (sub.py) - [ERROR] - サブファイルのロギング設定のエラーです。
 ```
 
 
@@ -167,10 +171,11 @@ FORMATTER = '%(asctime)s - (%(filename)s) - [%(levelname)s] - %(message)s'
 # logging.basicConfig(level=logging.INFO)
 
 # create logger
+# ロガーの共通設定になるレベルは最も低レベルのDEBUGを定義している。
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-# handler = logging.StreamHandler()
+# DEBUGレベルのログを'log/debug_handler.log'へ出力する。
 handler = logging.FileHandler(
   'log/debug_handler.log',mode='w'
   )
@@ -178,8 +183,9 @@ handler.setLevel(logging.DEBUG)
 handler.setFormatter(logging.Formatter(FORMATTER))
 logger.addHandler(handler)
 
+# WARNINGレベルのログを'log/warn_handler.log'へ出力する。
 warn_handler = logging.FileHandler(
-  'log/info_handler.log',mode='w'
+  'log/warn_handler.log',mode='w'
   )
 warn_handler.setLevel(logging.WARNING)
 warn_handler.setFormatter(logging.Formatter(FORMATTER))
@@ -202,7 +208,7 @@ logger.critical('緊急事態です。')
 2024-12-22 11:14:50,354 - (log3.py) - [CRITICAL] - 緊急事態です。
 ```
 
-```py:log/info_handler.log
+```py:log/warn_handler.log
 2024-12-22 11:14:50,354 - (log3.py) - [WARNING] - 警告です。
 2024-12-22 11:14:50,354 - (log3.py) - [ERROR] - ファイルが見つかりません。
 2024-12-22 11:14:50,354 - (log3.py) - [CRITICAL] - 緊急事態です。
@@ -225,7 +231,7 @@ logger.addHandler(stream_handler)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 stream_handler.setFormatter(formatter)
 
-# ログフィルターの内容を定義
+# ログフィルターの内容をカスタムで定義
 class LogFilter(logging.Filter):
   def filter(self,ignore):
     word = ignore.getMessage()
@@ -331,6 +337,9 @@ logger.error("This is an error message.")
 [DEBUG] main.py -> This is a debug message.
 [WARNING] main.py -> This is a warning message.
 [ERROR] main.py -> This is an error message.
+
+# 「logger.info("Sensitive data: password=12345")」で設定したメッセージは、
+# logging.jsonで定義しているwordsの中にある文字列を含んでいるため表示されない。
 ```
 
 ## 参考
