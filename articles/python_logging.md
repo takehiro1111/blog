@@ -1,5 +1,5 @@
 ---
-title: "[Python]ロギングの使い方"
+title: "[Python]ロギングの基本的な書き方"
 emoji: "💬"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["python"]
