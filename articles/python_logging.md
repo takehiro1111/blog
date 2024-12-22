@@ -324,7 +324,7 @@ class LogFilter(logging.Filter):
         return not any(word in record.getMessage() for word in self.words)
 ```
 
-```py:main.py
+```py:./main.py
 import logging.config
 import json
 
