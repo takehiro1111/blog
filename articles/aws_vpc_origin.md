@@ -139,7 +139,7 @@ module "cloudfront_vpc_origin_test" {
 
 
 ## 7.まとめ
-今回の記事では、以下を実装しました。
+今回の記事では、以下を記載しました。
 
 - Terraformを用いたVPCオリジンの実装
 
