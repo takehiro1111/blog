@@ -1,5 +1,5 @@
 ---
-title: "Amazon CloudFront VPC オリジンを設定する際のTerraformの書き方"
+title: "Amazon CloudFront VPC オリジンをTerraformで設定"
 emoji: "📝"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Terraform","AWS"]
