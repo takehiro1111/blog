@@ -91,7 +91,7 @@ https://registry.terraform.io/modules/terraform-aws-modules/cloudfront/aws/lates
 
 https://github.com/terraform-aws-modules/terraform-aws-cloudfront
 :::message alert
-バージョン4.0.0からの対応になるため、実装する際に必ず確認してください。
+Ver`4.0.0`からの対応になるため、実装する際に必ず確認してください。
 :::
 
 ```hcl
