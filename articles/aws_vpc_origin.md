@@ -141,6 +141,6 @@ module "cloudfront_vpc_origin_test" {
 ## 7.まとめ
 今回の記事では、以下を実装しました。
 
-- VPCオリジンをTerraformを用いた実装
+- Terraformを用いたVPCオリジンの実装
 
 TerraformでVPCオリジンを簡単に導入する方法を知る一助になれば幸いです！
