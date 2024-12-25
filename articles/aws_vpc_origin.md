@@ -132,8 +132,8 @@ module "cloudfront_vpc_origin_test" {
 
 ```
 
-## 6.出来上がりのWebページの画面
-- VPCオリジン設定後にプライベートサブネットに配置したInternalALBにアクセスし、疎通出来ています。
+## 6.リクエスト確認
+- VPCオリジン設定後にプライベートサブネットに配置したInternalALB経由でECSのテストページへアクセスし、`200`で返ることが確認出来ました。
 ![](/images/vpc_origin/cdn.png)
 
 
