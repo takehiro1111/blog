@@ -33,7 +33,7 @@ published: false
 - リソースを作成する際は問題なかったが、修正する際には一度CloudFrontでVPCオリジンの設定を無効化してからでないとVPCオリジンの設定を変更できなかったので少し面倒。
 
 #### ②ENI作成の制限
-- 大規模な環境だと、ENIの作成が上限に達する可能性がある。
+- 大規模な開発環境だと、ENIの作成が上限に達する可能性がある。
 
 ## 4.従来構成からの修正点
 - **CloudFront**
@@ -122,7 +122,7 @@ module "cloudfront_vpc_origin_test" {
       origin_id   = {オリジンサーバの識別子}
 
       vpc_origin_config = {
-        vpc_origin_id            = module.cloudfront_vpc_origin_test.cloudfront_vpc_origin_ids
+        vpc_origin_id            = module.cloudfront_vpc_origin_test.cloudfront_vpc_origin_ids[0]
         origin_keepalive_timeout = 5
         origin_read_timeout      = 30
       }
