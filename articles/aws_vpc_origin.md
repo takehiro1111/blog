@@ -1,42 +1,55 @@
 ---
-title: "Amazon CloudFront VPC オリジンをTerraformで設定"
+title: "CloudFrontの新機能『VPCオリジン』をTerraformで書いてみた"
 emoji: "📝"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Terraform","AWS"]
 published: false
 ---
+![](/images/terraform_logo.png)
 
-## VPCオリジンとは？
-- **AWS re:Invent 2024**で新発表された機能です。  
-例えば、ALBを用いた従来の構成だとALBをパブリックサブネットに配置してCloudFrontのマネージドプレフィクスで  
-CloudFront経由のアクセスに制限していましたが、VPCオリジンの設定によってALBをプライベートサブネットに配置でき、よりシンプルな設定でセキュアな環境を作れるようになります。
-また、ALBをパブリックサブネットに配置することでパブリックIPの料金がかかっていましたが、これを削減する副次効果もあります。
-
+## 1.VPCオリジンとは？
 - [AWS公式ブログ](https://aws.amazon.com/jp/blogs/news/introducing-amazon-cloudfront-vpc-origins-enhanced-security-and-streamlined-operations-for-your-applications/)での記載
 > Amazon Virtual Private Cloud (Amazon VPC) 内のプライベートサブネットでホストされているアプリケーションからのコンテンツ配信を可能にする新機能です。
 
-### 従来の構成
-構成図
-### VPCオリジンを用いた構成
-構成図
+**AWS re:Invent 2024**で新発表された機能で、プライベートサブネット内のアプリケーションを直接CloudFrontを通じて配信可能なため、  
+よりセキュアな構成を実現できる機能です。
 
-### 既存構成の修正点
-- CloudFront
+### 従来の構成イメージ
+![](/images/vpc_origin/ecs_conventional.png  =500x)
+
+### VPCオリジンを用いた構成イメージ
+![](/images/vpc_origin/ecs_conventional2.png  =500x)
+
+## 2.メリット
+#### ①セキュリティの強化
+- ALBをパブリックサブネットに配置する必要がなくなるため、外部からの直接アクセスを防げて、より簡潔な設定でCloudFront経由のアクセスに絞れる。
+
+#### ②コスト削減
+- パブリックIPアドレスの必要性がなくなることで、関連するコストを削減出来る可能性がある。
+
+## 3.デメリット
+#### ①Terraformで構築する際の依存関係
+- リソースを作成する際は問題なかったが、修正する際には一度CloudFrontでVPCオリジンの設定を無効化してからでないとVPCオリジンの設定を変更できなかったので少し面倒。
+
+#### ②ENI作成の制限
+- 大規模な環境だと、ENIの作成が上限に達する可能性がある。
+
+## 4.従来構成からの修正点
+- **CloudFront**
   - VPCオリジンの作成
-    - VPCオリジン用のENIが作成され、自動的に専用のセキュリティグループも作成されます。
-      - セキュリティグループのインバウンドルールは穴あけしなくて良い。
-  - CloudFrontディストリビューションのオリジン設定でVPCオリジンを有効化。
-- ALB
+    - VPCオリジンのENIが作成され、自動的に専用のセキュリティグループも作成される。
+  - CloudFrontディストリビューションのOrigin設定でVPCオリジンを有効化。
+- **ALB**
   - ALBのセキュリティグループでVPCオリジンのENIにアタッチされているSGをインバウンドルールで許可。
-  - ALBをInternal用で再作成する。
-  - プライベートサブネットに配置する
+  - ALBをInternal用で再作成する。（本番環境での切り替えはブルーグリーンなど検討）
+  - プライベートサブネットに配置。
 
-## TerraformでのVPCオリジンの実装
+## 5.TerraformでのVPCオリジンの実装
 - ALBやCloudFrontの設定変更などは既に様々なテックブログで発信されているため割愛し、    
 本記事ではVPCオリジンをコードで設定することに焦点を当てて記載します。
 
-### Resourceブロックでの設定
-- [Reference](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_vpc_origin)
+### ①Resourceブロックでの定義
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_vpc_origin
 ```hcl
 resource "aws_cloudfront_vpc_origin" "this" {
   vpc_origin_endpoint_config {
@@ -54,7 +67,7 @@ resource "aws_cloudfront_vpc_origin" "this" {
 }
 
 resource "aws_cloudfront_distribution" "this" {
-  ### 省略 ###
+  ### 抜粋 ###
   origin {
     connection_attempts = 3
     connection_timeout  = 10
@@ -63,39 +76,42 @@ resource "aws_cloudfront_distribution" "this" {
 
     vpc_origin_config {
       vpc_origin_id            = aws_cloudfront_vpc_origin.this.id
-      origin_keepalive_timeout = 5
-      origin_read_timeout      = 30
+      origin_keepalive_timeout = 5 // CloudFront がオリジンへの接続を維持する秒数
+      origin_read_timeout      = 30 // CloudFront がオリジンからの応答を待機する秒数
     }
   }
-  ### 省略 ###
+  ### 抜粋 ###
 }
 
 ```
 
-### 公式Moduleでの設定
-:::alert
-バージョン4.0.0からの対応になるため、実装する際に必ず確認してください。
-:::
+&nbsp;
+### ②AWSプロバイダが提供しているModuleでの定義
 https://registry.terraform.io/modules/terraform-aws-modules/cloudfront/aws/latest
 
-[Reference](https://github.com/terraform-aws-modules/terraform-aws-cloudfront)
+https://github.com/terraform-aws-modules/terraform-aws-cloudfront
+:::message alert
+バージョン4.0.0からの対応になるため、実装する際に必ず確認してください。
+:::
+
 ```hcl
 module "cloudfront_vpc_origin_test" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "4.0.0"
 
-  ### 省略 ###
+  ### 抜粋 ###
   create_vpc_origin = true
   vpc_origin = {
-    name                   = "test"
-    arn                    = {ALBのARN}
-    http_port              = 80
-    https_port             = 443
-    origin_protocol_policy = "https-only"
-
-    origin_ssl_protocols = {
-      items    = ["TLSv1.2"]
-      quantity = 1
+    test_vpc_origin = {
+      name = "test-vpc-origin"
+      arn = module.alb_wildcard_takehiro1111_com.arn
+      http_port = 80
+      https_port = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols = {
+        items = ["TLSv1.2"]
+        quantity = 1
+      }
     }
   }
 
@@ -111,15 +127,19 @@ module "cloudfront_vpc_origin_test" {
       }
     }
   }
-  ### 省略 ###
+  ### 抜粋 ###
 }
 
 ```
-## 出来上がりのWebページの画面
 
-## まとめ
-今回の記事では、以下を実装しました：
+## 6.出来上がりのWebページの画面
+- VPCオリジン設定後にプライベートサブネットに配置したInternalALBにアクセスし、疎通出来ています。
+![](/images/vpc_origin/cdn.png)
+
+
+## 7.まとめ
+今回の記事では、以下を実装しました。
 
 - VPCオリジンをTerraformを用いた実装
 
-VPCオリジンをTerraformで実装する場合はご参考になれば嬉しいです！
+TerraformでVPCオリジンを簡単に導入する方法を知る一助になれば幸いです！
