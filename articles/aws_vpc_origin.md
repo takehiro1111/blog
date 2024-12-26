@@ -29,7 +29,6 @@ published: false
 - グローバルIPアドレスの必要性がなくなることで、そのコストを削減できる。  
 ALBは各AZにノードを配置するため、AZ数に応じて以下のコストが削減可能となる。
 
-#### Reference
 https://aws.amazon.com/jp/blogs/news/new-aws-public-ipv4-address-charge-public-ip-insights/
 
 ```txt:コスト計算
