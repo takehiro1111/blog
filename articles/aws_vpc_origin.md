@@ -32,7 +32,7 @@ published: false
 
 https://aws.amazon.com/jp/blogs/news/new-aws-public-ipv4-address-charge-public-ip-insights/
 
-```txt:コスト計算
+```txt:GIPのコスト試算
 ### 単一のパブリックIPの月額コスト
 $0.005 * 24h * 30日 = $3.6/月
 
