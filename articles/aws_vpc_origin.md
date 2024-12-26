@@ -27,7 +27,7 @@ published: false
 
 ### ②コスト削減
 - ALBをプライベートサブネットに配置出来るため、グローバルIPアドレスの必要性がなくなる。    
-ALBを各AZにノードを配置するため、AZ数に応じて以下のコストが削減可能となる。
+各AZにノードを配置するため、AZ数に応じて以下のコストが削減可能となる。
 
 https://aws.amazon.com/jp/blogs/news/new-aws-public-ipv4-address-charge-public-ip-insights/
 
