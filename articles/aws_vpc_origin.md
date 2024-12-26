@@ -22,15 +22,17 @@ published: false
 ![](/images/vpc_origin/ecs_conventional2.png  =500x)
 
 ## 2.メリット
-#### ①セキュリティの強化
+### ①セキュリティの強化
 - ALBをパブリックサブネットに配置する必要がなくなるため、外部からの直接アクセスを防げて、より簡潔な設定でCloudFront経由のアクセスに絞れる。
 
-#### ②コスト削減
+### ②コスト削減
 - グローバルIPアドレスの必要性がなくなることで、そのコストを削減できる。  
 ALBは各AZにノードを配置するため、AZ数に応じて以下のコストが削減可能となる。
 
+#### Reference
+https://aws.amazon.com/jp/blogs/news/new-aws-public-ipv4-address-charge-public-ip-insights/
+
 ```txt
-## 試算
 ### 単一のパブリックIPの月額コスト
 $0.005 * 24h * 30日 = $3.6/月
 
@@ -39,16 +41,13 @@ $3.6 * 2 = $7.2/月
 
 ## 3つのAZでALBを設定している場合
 $3.6 * 3 = $10.8/月
-
-## Reference
-https://aws.amazon.com/jp/blogs/news/new-aws-public-ipv4-address-charge-public-ip-insights/
 ```
 
 ## 3.デメリット
-#### ①Terraformで構築する際の依存関係
+### ①Terraformで構築する際の依存関係
 - リソースを作成する際は問題なかったが、修正する際には一度CloudFrontでVPCオリジンの設定を無効化してからでないとVPCオリジンの設定を変更できなかったので少し面倒。
 
-#### ②ENI作成の制限
+### ②ENI作成の制限
 - 大規模な開発環境だと、ENIの作成が[VPCクォータ](https://docs.aws.amazon.com/ja_jp/vpc/latest/userguide/amazon-vpc-limits.html#vpc-limits-enis)に引っ掛かる可能性がある。
 
 ## 4.従来構成からの修正点
