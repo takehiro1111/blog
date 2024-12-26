@@ -26,7 +26,8 @@ published: false
 - ALBをパブリックサブネットに配置する必要がなくなるため、外部からの直接アクセスを防げて、より簡潔な設定でCloudFront経由のアクセスに絞れる。
 
 #### ②コスト削減
-- パブリックIPアドレスの必要性がなくなることで、関連するコストを削減出来る可能性がある。
+- パブリックIPアドレスの必要性がなくなることで、その分のコストを削減出来る。
+
 
 ## 3.デメリット
 #### ①Terraformで構築する際の依存関係
@@ -34,6 +35,7 @@ published: false
 
 #### ②ENI作成の制限
 - 大規模な開発環境だと、ENIの作成が上限に達する可能性がある。
+https://docs.aws.amazon.com/ja_jp/vpc/latest/userguide/amazon-vpc-limits.html#vpc-limits-enis
 
 ## 4.従来構成からの修正点
 - **CloudFront**
