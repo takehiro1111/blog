@@ -26,8 +26,8 @@ published: false
 - ALBをパブリックサブネットに配置する必要がなくなるため、外部からの直接アクセスを防げて、より簡潔な設定でCloudFront経由のアクセスに絞れる。
 
 ### ②コスト削減
-- グローバルIPアドレスの必要性がなくなることで、そのコストを削減できる。  
-ALBは各AZにノードを配置するため、AZ数に応じて以下のコストが削減可能となる。
+- ALBをプライベートサブネットに配置出来るため、グローバルIPアドレスの必要性がなくなる。    
+ALBを各AZにノードを配置するため、AZ数に応じて以下のコストが削減可能となる。
 
 https://aws.amazon.com/jp/blogs/news/new-aws-public-ipv4-address-charge-public-ip-insights/
 
