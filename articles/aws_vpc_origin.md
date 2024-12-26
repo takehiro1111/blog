@@ -34,8 +34,8 @@ published: false
 - リソースを作成する際は問題なかったが、修正する際には一度CloudFrontでVPCオリジンの設定を無効化してからでないとVPCオリジンの設定を変更できなかったので少し面倒。
 
 #### ②ENI作成の制限
-- 大規模な開発環境だと、ENIの作成が上限に達する可能性がある。
-https://docs.aws.amazon.com/ja_jp/vpc/latest/userguide/amazon-vpc-limits.html#vpc-limits-enis
+- 大規模な開発環境だと、ENIの作成が[VPCクォータ](https://docs.aws.amazon.com/ja_jp/vpc/latest/userguide/amazon-vpc-limits.html#vpc-limits-enis)に引っ掛かる可能性がある。
+
 
 ## 4.従来構成からの修正点
 - **CloudFront**
