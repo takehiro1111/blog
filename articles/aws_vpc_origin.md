@@ -13,7 +13,7 @@ published: false
 > Amazon Virtual Private Cloud (Amazon VPC) 内のプライベートサブネットでホストされているアプリケーションからのコンテンツ配信を可能にする新機能です。
 
 **AWS re:Invent 2024**で新発表された機能です。  
-プライベートサブネット内のアプリケーションを直接CloudFrontを通じて配信可能なため、よりキュアな構成を実現できる機能です。
+プライベートサブネット内のアプリケーションを直接CloudFrontを通じて配信可能なため、よりセキュアな構成を実現できる機能です。
 
 ### 従来の構成イメージ
 ![](/images/vpc_origin/ecs_conventional.png  =500x)
@@ -134,7 +134,7 @@ module "cloudfront_vpc_origin_test" {
 ```
 
 ## 6.リクエスト確認
-- VPCオリジン設定後にプライベートサブネットに配置したInternalALB経由でECSのテストページへアクセスし、`200`で返ることが確認出来ました。
+- VPCオリジン設定後にプライベートサブネットに配置したInternalALB経由でECSのテストページへアクセスし、`200`が返ることが確認出来ました。
 ![](/images/vpc_origin/cdn.png)
 
 
