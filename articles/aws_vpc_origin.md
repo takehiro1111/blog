@@ -27,7 +27,17 @@ published: false
 
 #### ②コスト削減
 - パブリックIPアドレスの必要性がなくなることで、その分のコストを削減出来る。
+```txt
+# 単一のパブリックIPの月額コスト
+$0.005 * 24h * 30days = $3.6
 
+# 2つのAZ(最小構成)でALBを設定している場合
+$3.6 * 2 = $7.2 
+
+# 3つのAZでALBを設定している場合
+$3.6 * 3 = $10.8 
+
+```
 
 ## 3.デメリット
 #### ①Terraformで構築する際の依存関係
@@ -35,7 +45,6 @@ published: false
 
 #### ②ENI作成の制限
 - 大規模な開発環境だと、ENIの作成が[VPCクォータ](https://docs.aws.amazon.com/ja_jp/vpc/latest/userguide/amazon-vpc-limits.html#vpc-limits-enis)に引っ掛かる可能性がある。
-
 
 ## 4.従来構成からの修正点
 - **CloudFront**
