@@ -32,13 +32,13 @@ published: false
 https://aws.amazon.com/jp/blogs/news/new-aws-public-ipv4-address-charge-public-ip-insights/
 
 ```txt:コスト計算
-# 単一のパブリックIPの月額コスト
+### 単一のパブリックIPの月額コスト
 $0.005 * 24h * 30日 = $3.6/月
 
-# 2つのAZ(最小構成)でALBを設定している場合
+### 2つのAZ(最小構成)でALBを設定している場合
 $3.6 * 2 = $7.2/月
 
-# 3つのAZでALBを設定している場合
+### 3つのAZでALBを設定している場合
 $3.6 * 3 = $10.8/月
 ```
 
