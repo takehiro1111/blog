@@ -4,7 +4,7 @@ emoji: "📝"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Terraform","AWS"]
 publication_name: "nextbeat"
-published: false
+published: true
 ---
 ![](/images/terraform_logo.png)
 
@@ -24,7 +24,7 @@ published: false
 
 ## 2.メリット
 ### ①セキュリティの強化
-- ALBをパブリックサブネットに配置する必要がなくなるため、外部からの直接アクセスを防げて、より簡潔な設定でCloudFront経由のアクセスに絞れる。
+- ALBをパブリックサブネットに配置する必要がなくなるため、外部からの直接アクセスを防ぐことが出来、より簡潔な設定でCloudFront経由のアクセスに絞れる。
 
 ### ②コスト削減
 - ALBをプライベートサブネットに配置出来るため、グローバルIPアドレスの必要性がなくなる。    
@@ -32,8 +32,8 @@ published: false
 
 https://aws.amazon.com/jp/blogs/news/new-aws-public-ipv4-address-charge-public-ip-insights/
 
-```txt:GIPのコスト試算
-### 単一のパブリックIPの月額コスト
+```txt:GIPコスト試算
+### 単一のグローバルIPの月額コスト
 $0.005 * 24h * 30日 = $3.6/月
 
 ### 2つのAZ(最小構成)でALBを設定している場合
@@ -57,7 +57,7 @@ $3.6 * 3 = $10.8/月
   - CloudFrontディストリビューションのOrigin設定でVPCオリジンを有効化。
 - **ALB**
   - ALBのセキュリティグループでVPCオリジンのENIにアタッチされているSGをインバウンドルールで許可。
-  - ALBをInternal用で再作成する。（本番環境での切り替えはブルーグリーンなど検討）
+  - ALBをInternal用で再作成する。（本番環境はブルーグリーンでの切り替えが安全そう）
   - プライベートサブネットに配置。
 
 ## 5.TerraformでのVPCオリジンの実装
@@ -107,7 +107,7 @@ https://registry.terraform.io/modules/terraform-aws-modules/cloudfront/aws/lates
 
 https://github.com/terraform-aws-modules/terraform-aws-cloudfront
 :::message alert
-Ver`4.0.0`からの対応になるため、実装する際に必ず確認してください。
+`version = "4.0.0"`から対応しているため、実装する際に必ず確認してください。
 :::
 
 ```hcl
@@ -120,7 +120,7 @@ module "cloudfront_vpc_origin_test" {
   vpc_origin = {
     test_vpc_origin = {
       name = "test-vpc-origin"
-      arn = module.alb_wildcard_takehiro1111_com.arn
+      arn = {ALBのARN}
       http_port = 80
       https_port = 443
       origin_protocol_policy = "https-only"
@@ -158,4 +158,4 @@ module "cloudfront_vpc_origin_test" {
 
 - Terraformを用いたVPCオリジンの実装
 
-TerraformでVPCオリジンを簡単に導入する方法を知る一助になれば幸いです！
+TerraformでVPCオリジンを簡単に導入する方法を知る一助になれば幸いです!!
