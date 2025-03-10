@@ -77,7 +77,7 @@ resource "aws_cloudfront_vpc_origin" "this" {
 
     origin_ssl_protocols {
       items    = ["TLSv1.2"]
-      quantity = 1
+      quantity = length(toset(["TLSv1.2"]))
     }
   }
 }
@@ -126,7 +126,7 @@ module "cloudfront_vpc_origin_test" {
       origin_protocol_policy = "https-only"
       origin_ssl_protocols = {
         items = ["TLSv1.2"]
-        quantity = 1
+        quantity = length(toset(["TLSv1.2"]))
       }
     }
   }
@@ -137,7 +137,7 @@ module "cloudfront_vpc_origin_test" {
       origin_id   = {オリジンサーバの識別子}
 
       vpc_origin_config = {
-        vpc_origin_id            = module.cloudfront_vpc_origin_test.cloudfront_vpc_origin_ids[0]
+        vpc_origin_id            = element(module.cloudfront_vpc_origin_test.vpc_origin_ids, 0)
         origin_keepalive_timeout = 5
         origin_read_timeout      = 30
       }
