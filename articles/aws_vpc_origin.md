@@ -77,7 +77,7 @@ resource "aws_cloudfront_vpc_origin" "this" {
 
     origin_ssl_protocols {
       items    = ["TLSv1.2"]
-      quantity = 1
+      quantity = length(toset(["TLSv1.2"]))
     }
   }
 }
@@ -126,7 +126,7 @@ module "cloudfront_vpc_origin_test" {
       origin_protocol_policy = "https-only"
       origin_ssl_protocols = {
         items = ["TLSv1.2"]
-        quantity = 1
+        quantity = length(toset(["TLSv1.2"]))
       }
     }
   }
