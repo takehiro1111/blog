@@ -137,7 +137,7 @@ module "cloudfront_vpc_origin_test" {
       origin_id   = {オリジンサーバの識別子}
 
       vpc_origin_config = {
-        vpc_origin_id            = module.cloudfront_vpc_origin_test.cloudfront_vpc_origin_ids[0]
+        vpc_origin_id            = element(module.cloudfront_vpc_origin_test.vpc_origin_ids, 0)
         origin_keepalive_timeout = 5
         origin_read_timeout      = 30
       }
