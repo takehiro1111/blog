@@ -224,15 +224,8 @@ func (m *MockRateLimitRealTimeProvider) Now() time.Time {
 	return m.currentTime
 }
 
+// 前回テストの値をリセット
 func resetRateLimiter() {
-	// stopCleanupが閉じられていなければ閉じる（goroutineが起動している場合のみ）
-	select {
-	case <-stopCleanup:
-		// 閉じたチャネルから受信し何も処理をしない。
-	default:
-		close(stopCleanup)
-	}
-
 	mu.Lock()
 	defer mu.Unlock()
 	limiters = make(map[string]*limiterInfo)
