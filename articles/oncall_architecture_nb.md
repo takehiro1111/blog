@@ -2,7 +2,7 @@
 title: "[AWS]サーバレスで始めるオンコール基盤の構築"
 emoji: "🦔"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["AWS", "Prometheus", "サーバレス", "Python", "障害対応"]
+topics: ["AWS", "Prometheus", "Lambda", "Python", "障害対応"]
 published: false
 publication_name: "nextbeat"
 ---
