@@ -91,6 +91,7 @@ func StartCleanup() {
 		timeConfig = &RateLimitConfig{
 			TimeProvider:      &RateLimitRealTimeProvider{},
 			CleanupInterval:   10 * time.Minute,
+			// 基準時刻よりも30分以前の時刻を指定したいため"-"を付加している。
 			InactiveThreshold: -30 * time.Minute,
 			RateLimit:         time.Minute / 10,
 			Burst:             10,
@@ -168,7 +169,7 @@ func RateLimit(next http.Handler) http.Handler {
 		limiter := getLimiter(ip)
 
 		if !limiter.Allow() {
-			// クライアントへ警告
+			// クライアントに再試行可能な時間を通知するためヘッダーを設定。
 			w.Header().Set("Retry-After", "60")
 			log.Printf("Rate limit exceeded for IP: %s\n", ip)
 			http.Error(w, ErrMsgTooManyRequest, http.StatusTooManyRequests)
@@ -181,6 +182,10 @@ func RateLimit(next http.Handler) http.Handler {
 ```
 
 ## 単体テスト
+- DRY原則に従いテストコードが重複しないようテーブル駆動の記述にしています。
+- テスト対象
+	- 核となるRateLimitterの処理
+	- メモリリーク防止のための基準時刻より前のRateLimitterをメモリから削除する処理
 
 ```go
 package main
@@ -217,8 +222,8 @@ func TestCleanupLimiters(t *testing.T) {
 	tests := []struct {
 		name            string
 		setupIPs        map[string]time.Time
-		expectedIpCount int
-		expectedIPs     []string
+		expectedIpCount int // 基準時間内にratelimiterとしてメモリに残っているIPの数
+		expectedIPs     []string // 基準時間内にratelimiterとしてメモリに残っているIPアドレス
 	}{
 		{
 			name: "正常系: 30分以上古いエントリが削除される",
@@ -281,7 +286,6 @@ func TestCleanupLimiters(t *testing.T) {
 
 			cleanupLimiters()
 
-			// 残っているIPの数を確認
 			mu.Lock()
 			assert.Equal(t, tc.expectedIpCount, len(limiters))
 
@@ -440,9 +444,9 @@ func main() {
 ## 実行結果
 
 - 単体テスト
+:::details 結果
 
 ```shell
-$go test -run TestCleanupLimiters -v
 $go test -run TestCleanupLimiters -v
 === RUN   TestCleanupLimiters
 === RUN   TestCleanupLimiters/正常系:_30分以上古いエントリが削除される
@@ -479,6 +483,7 @@ $go test -run TestRateLimit  -v
 PASS
 ok  	go-learning/tasks/api/http	0.201s
 ```
+:::
 
 ### シェルスクリプトで`curl`叩いてレスポンスを確認
 
