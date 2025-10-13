@@ -109,7 +109,7 @@ receivers:
 - **SlackNotification / SlackAlert**
   - [SlackのSDK](https://docs.slack.dev/tools/python-slack-sdk/)経由でアラート通知を実行する
 
-### 3-5. Slack通知イメージ
+### 3-5. Slack通知
 
 - エンジニア全員が参加している、クリティカルな障害を検知する Slack チャンネルへ通知しています。
 
