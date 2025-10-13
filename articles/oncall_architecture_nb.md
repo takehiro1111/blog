@@ -1,8 +1,8 @@
 ---
-title: "[AWS]サーバレスで始めるオンコール基盤の構築"
+title: "Prometheus + Step Functions + Lambdaで構築するサーバレスオンコール基盤"
 emoji: "🦔"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["AWS", "Prometheus", "Lambda", "Python", "障害対応"]
+topics: ["AWS", "Prometheus", "StepFunctions", "Lambda", "監視"]
 published: false
 publication_name: "nextbeat"
 ---
@@ -16,9 +16,9 @@ publication_name: "nextbeat"
 
 ### 具体的な監視項目
 
-- 監視項目は大きく分けて2つあります。
+- 監視項目は大きく分けて 2 つあります。
   - アプリケーションの死活監視
-    - 設定したエンドポイントをGETで叩き、HTTPステータスコード`200`以外を一定時間連続で検知した場合にSlack通知、架電を実施
+    - 設定したエンドポイントを GET で叩き、HTTP ステータスコード`200`以外を一定時間連続で検知した場合に Slack 通知、架電を実施
   - アプリケーションのリソース監視
     - 具体的には一部機能で使用している`EC2`、`OpenSearch`の`CPU`、`Memory`、`Storage`のメトリクス
 
@@ -68,7 +68,7 @@ URL 監視を例に、主要なコンポーネントについてざっくり説�
 
 ### 3-2. AlertManager
 
-- Prometheusのアラートを受け取り、API Gatewayのエンドポイントを叩いてStep Functionsを起動します。
+- Prometheus のアラートを受け取り、API Gateway のエンドポイントを叩いて Step Functions を起動します。
 
 ```yaml
 route:
@@ -87,7 +87,7 @@ receivers:
 
 ### 3-3. Step Functions
 
-- AlertManagerからのリクエストを受け取り、Lambdaを順次実行するワークフローを管理します。
+- AlertManager からのリクエストを受け取り、Lambda を順次実行するワークフローを管理します。
   - `severity`の値に応じて発火するバックエンドの Lambda を分岐させています。
 
 ![](/images/nb/oncall_state.png =600x)
@@ -97,14 +97,14 @@ receivers:
 各 Lambda の役割は以下の通りです：
 
 - **ReceiveAlerts**
-  - API Gatewayからのリクエストを受け取り、`severity`の値を返す
-  - `DynamoDB`からオンコール担当者の電話番号を取得し、以降のLambdaに引き渡す
+  - API Gateway からのリクエストを受け取り、`severity`の値を返す
+  - `DynamoDB`からオンコール担当者の電話番号を取得し、以降の Lambda に引き渡す
 - **PhoneCall**
 
   - `Twilio`の API を利用して電話通知を実施
   - さらに API Gateway のエンドポイントを叩いて電話の発信を行う
   - 電話が繋がった場合は`success`、繋がらなかった場合は`fail`、電話をかける必要のないプロダクトは`skip`を返す
-  - 誰かが電話に出るまで、DynamoDBから取得した電話番号のリストを基に電話をかける処理をループします。
+  - 誰かが電話に出るまで、DynamoDB から取得した電話番号のリストを基に電話をかける処理をループします。
 
 - **SlackNotification / SlackAlert**
   - [SlackのSDK](https://docs.slack.dev/tools/python-slack-sdk/)経由でアラート通知を実行する
