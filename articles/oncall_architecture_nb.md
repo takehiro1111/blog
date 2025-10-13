@@ -104,6 +104,7 @@ receivers:
   - `Twilio`の API を利用して電話通知を実施
   - さらに API Gateway のエンドポイントを叩いて電話の発信を行う
   - 電話が繋がった場合は`success`、繋がらなかった場合は`fail`、電話をかける必要のないプロダクトは`skip`を返す
+  - 誰かが電話に出るまで、DynamoDBから取得した電話番号のリストを基に電話をかける処理をループします。
 
 - **SlackNotification / SlackAlert**
   - [SlackのSDK](https://docs.slack.dev/tools/python-slack-sdk/)経由でアラート通知を実行する
