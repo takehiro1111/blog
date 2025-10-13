@@ -78,6 +78,8 @@ var (
 	mu         sync.Mutex
 	limiters   = make(map[string]*limiterInfo)
 	timeConfig *RateLimitConfig
+	stopCleanup = make(chan struct{}) // メモリ0バイトのため、struct{}を使用している
+	cleanupOnce sync.Once
 )
 
 // テスト用のDI
@@ -87,23 +89,36 @@ func InitRateLimiter(cfg *RateLimitConfig) {
 
 // メモリリークを防ぐため定期的にクリーンアップを実行
 func StartCleanup() {
-	if timeConfig == nil {
-		timeConfig = &RateLimitConfig{
-			TimeProvider:      &RateLimitRealTimeProvider{},
-			CleanupInterval:   10 * time.Minute,
-			// 基準時刻よりも30分以前の時刻を指定したいため"-"を付加している。
-			InactiveThreshold: -30 * time.Minute,
-			RateLimit:         time.Minute / 10,
-			Burst:             10,
+	// StartCleanup()が複数回呼ばれても、goroutineは1つだけ起動
+	cleanupOnce.Do(func() {
+		if timeConfig == nil {
+			timeConfig = &RateLimitConfig{
+				TimeProvider:      &RateLimitRealTimeProvider{},
+				CleanupInterval:   10 * time.Minute,
+				InactiveThreshold: -30 * time.Minute,
+				RateLimit:         time.Minute / 10,
+				Burst:             10,
+			}
 		}
-	}
 
-	ticker := time.NewTicker(timeConfig.CleanupInterval)
-	go func() {
-		for range ticker.C {
-			cleanupLimiters()
-		}
-	}()
+		// goroutineが一度閉じた後にStartCleanupが実行された際にgoroutineを再開させるための初期化処理
+		stopCleanup = make(chan struct{})
+
+		// メモリリークを防ぐため定期的にクリーンアップを実行
+		ticker := time.NewTicker(timeConfig.CleanupInterval)
+		go func() {
+			// stopCleanup を受信するとticker.Stop()が実行される
+			defer ticker.Stop()
+			for {
+				select {
+				case <-ticker.C:
+					cleanupLimiters()
+				case <-stopCleanup:
+					return
+				}
+			}
+		}()
+	})
 }
 
 func cleanupLimiters() {
@@ -195,6 +210,7 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+	"sync"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/time/rate"
@@ -212,6 +228,9 @@ func (m *MockRateLimitRealTimeProvider) Now() time.Time {
 }
 
 func resetRateLimiter() {
+	close(stopCleanup) // 古いgoroutineを停止
+	cleanupOnce = sync.Once{} // テスト用の1回呼び出しの制約リセット
+
 	mu.Lock()
 	defer mu.Unlock()
 	limiters = make(map[string]*limiterInfo)
