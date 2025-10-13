@@ -101,9 +101,6 @@ func StartCleanup() {
 			}
 		}
 
-		// goroutineが一度閉じた後にStartCleanupが実行された際にgoroutineを再開させるための初期化処理
-		stopCleanup = make(chan struct{})
-
 		// メモリリークを防ぐため定期的にクリーンアップを実行
 		ticker := time.NewTicker(timeConfig.CleanupInterval)
 		go func() {
@@ -228,8 +225,13 @@ func (m *MockRateLimitRealTimeProvider) Now() time.Time {
 }
 
 func resetRateLimiter() {
-	close(stopCleanup) // 古いgoroutineを停止
-	cleanupOnce = sync.Once{} // テスト用の1回呼び出しの制約リセット
+	// stopCleanupが閉じられていなければ閉じる（goroutineが起動している場合のみ）
+	select {
+	case <-stopCleanup:
+		// 閉じたチャネルから受信し何も処理をしない。
+	default:
+		close(stopCleanup)
+	}
 
 	mu.Lock()
 	defer mu.Unlock()
