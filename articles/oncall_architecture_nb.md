@@ -22,7 +22,7 @@ publication_name: "nextbeat"
   - アプリケーションのリソース監視
     - 具体的には一部機能で使用している`EC2`、`OpenSearch`の`CPU`、`Memory`、`Storage`のメトリクス
 
-## 2. アーキテクチャの概要
+## 2. アーキテクチャ
 
 ![](/images/nb/monitor_alerts.png =1000x)
 
