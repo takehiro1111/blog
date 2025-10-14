@@ -2,7 +2,7 @@
 title: "Prometheus + Step Functions + Lambdaで構築するサーバレスオンコール基盤"
 emoji: "🦔"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["AWS", "Prometheus", "StepFunctions", "Lambda", "監視"]
+topics: ["AWS", "Prometheus", "StepFunctions", "Lambda", "Python"]
 published: true
 publication_name: "nextbeat"
 ---
