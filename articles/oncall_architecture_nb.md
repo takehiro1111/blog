@@ -3,7 +3,7 @@ title: "Prometheus + Step Functions + Lambdaで構築するサーバレスオン
 emoji: "🦔"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS", "Prometheus", "StepFunctions", "Lambda", "監視"]
-published: false
+published: true
 publication_name: "nextbeat"
 ---
 
