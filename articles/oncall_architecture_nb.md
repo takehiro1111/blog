@@ -77,10 +77,10 @@ URL 監視を例に、主要なコンポーネントについてざっくり説�
 ```yaml
 route:
   receiver: "slack"
-  group_by: [instance, alertname]
+  group_by: [instance, alertname] # アラート発砲時のグルーピングは改善したい...
   group_wait: 10s # 最初のアラートが来て10秒待ってから通知
-  group_interval: 5m # 同じアラートが5分以内に発生した場合はまとめて通知
-  repeat_interval: 30m # 30分ごとにリマインド
+  group_interval: 5m # 一度通知した後に次の通知まで5分待機
+  repeat_interval: 30m #  解消されていないアラートは30分ごとに再通知
 
 receivers:
   - name: "slack"
@@ -102,7 +102,7 @@ receivers:
 
 - **ReceiveAlerts**
   - API Gateway からのリクエストを受け取り、`severity`の値を返す
-  - `DynamoDB`からオンコール担当者の電話番号を取得し、以降の Lambda に引き渡す
+  - `DynamoDB`からオンコール担当者の電話番号を取得し、以降の Lambda に引き継ぐ
 - **PhoneCall**
 
   - `Twilio`の API を利用して電話通知を実施
