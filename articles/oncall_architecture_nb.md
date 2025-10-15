@@ -18,6 +18,9 @@ publication_name: "nextbeat"
 - 弊社では全員 CTO というテーマを掲げて、各エンジニアが主体的に事業及びプロダクトに関わる文化を醸成しています。
   それに伴い、オンコール体制もエンジニア全員が参加する体制をとっています。
 
+`全員CTOとは？`と気になる方は[Entrance Book](https://note.nextbeat.co.jp/n/nd6f64ba9b8dc)覗いてみてください😄
+https://note.nextbeat.co.jp/n/nd6f64ba9b8dc
+
 ### 具体的な監視項目
 
 - 監視項目は大きく分けて 2 つあります。
