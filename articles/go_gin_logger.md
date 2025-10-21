@@ -517,7 +517,7 @@ func (g *RealUUIDGenerator) Generate() string {
 ```
 :::
 
-### main.go
+## 3.main.go
 - 今回の記事の趣旨はロギングのMiddleware実装のため、handler側は簡易的にmainに統合している。
 ```go
 package main
