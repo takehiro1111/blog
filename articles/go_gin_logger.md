@@ -110,7 +110,7 @@ https://github.com/golang-standards/project-layout
 ```
 
 ## 4-2.logger.go
-### Middlewareのメインの処理
+### Middleware側の処理の完全版
 
 :::details 完成系
 ```go
@@ -481,10 +481,10 @@ func LoggerMiddleware(loggerConfig *LoggerConfig) gin.HandlerFunc {
 	}
 }
 ```
-
 :::
 
 ## セクション別に部分的な実装の表示
+### Middlewareのメインの処理
 
 :::details LoggerMiddleware
 
