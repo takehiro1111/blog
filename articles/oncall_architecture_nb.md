@@ -2,8 +2,8 @@
 title: "Prometheus + Step Functions + Lambdaで構築するサーバレスオンコール基盤"
 emoji: "🦔"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["AWS", "Prometheus", "StepFunctions", "Lambda", "監視"]
-published: false
+topics: ["AWS", "Prometheus", "StepFunctions", "Lambda", "Python"]
+published: true
 publication_name: "nextbeat"
 ---
 
@@ -17,6 +17,9 @@ publication_name: "nextbeat"
 
 - 弊社では全員 CTO というテーマを掲げて、各エンジニアが主体的に事業及びプロダクトに関わる文化を醸成しています。
   それに伴い、オンコール体制もエンジニア全員が参加する体制をとっています。
+
+`全員CTOとは？`と気になる方は[Entrance Book](https://note.nextbeat.co.jp/n/nd6f64ba9b8dc)覗いてみてください😄
+https://note.nextbeat.co.jp/n/nd6f64ba9b8dc
 
 ### 具体的な監視項目
 
@@ -77,10 +80,10 @@ URL 監視を例に、主要なコンポーネントについてざっくり説�
 ```yaml
 route:
   receiver: "slack"
-  group_by: [instance, alertname]
+  group_by: [instance, alertname] # アラート発砲時のグルーピングは改善したい...
   group_wait: 10s # 最初のアラートが来て10秒待ってから通知
-  group_interval: 5m # 同じアラートが5分以内に発生した場合はまとめて通知
-  repeat_interval: 30m # 30分ごとにリマインド
+  group_interval: 5m # 一度通知した後に次の通知まで5分待機
+  repeat_interval: 30m #  解消されていないアラートは30分ごとに再通知
 
 receivers:
   - name: "slack"
@@ -102,7 +105,7 @@ receivers:
 
 - **ReceiveAlerts**
   - API Gateway からのリクエストを受け取り、`severity`の値を返す
-  - `DynamoDB`からオンコール担当者の電話番号を取得し、以降の Lambda に引き渡す
+  - `DynamoDB`からオンコール担当者の電話番号を取得し、以降の Lambda に引き継ぐ
 - **PhoneCall**
 
   - `Twilio`の API を利用して電話通知を実施
