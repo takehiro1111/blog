@@ -6,12 +6,12 @@ topics: ["Go","Gin", "slog"]
 published: true
 ---
 
-# 記事を書いた背景
+# 1.記事を書いた背景
 - 自分の整理用とこんな書き方もあるんだ程度に参考になればと思い記事に起こしています。
 	- 当初はレベルや出力先のみ指定してパスくらい表示するよう実装しようと思っていましたが、実装を進める中で変なスイッチも入り、様々な機能を追加していきました。結果的に実用的なミドルウェアとして、リクエストボディのマスキングや分散トレーシングのためのリクエストID生成など、本番環境での使用を一定想定した機能を実装しています。
 
 
-# 機能要件
+# 2.機能要件
 ```md
 - ミドルウェアとして実装してラップすることで全てのエンドポイントに適用できる。
 - 時刻等の可変性のある設定については、依存性を注入し実装すること。
@@ -26,7 +26,7 @@ published: true
 - ステータスコードに応じてログのレベルを動的に設定できる
 ```
 
-## ログのフォーマット
+# 3.ログのフォーマット
   - Request
   ```zsh
   GET level=INFO msg=[Req] method=GET path=/test query="" ip=::1 user_agent=curl/8.7.1 request_id=d35c5885-3a17-4867-b0f7-ff21f2d909ec
@@ -87,8 +87,8 @@ time=2025-10-21T15:43:36.093+09:00 level=WARN msg=[Res] method=POST path=/api/v1
 [GIN] 2025/10/21 - 15:43:36 | 404 |     102.792µs |             ::1 | POST     "/api/v1/users"
 ```
 
-# 実装内容
-## 1.ディレクトリ構造
+# 4.実装内容
+## 4-1.ディレクトリ構造
 - 今回はGin専用のMiddlewareで内部的にしか使用しないパッケージとして作成したいため、以下を参考にルートで`/internal`を切って、その配下で実装しました。
 https://github.com/golang-standards/project-layout
 
@@ -109,7 +109,7 @@ https://github.com/golang-standards/project-layout
 
 ```
 
-## 2.logger.go
+## 4-2.logger.go
 ### Middlewareのメインの処理
 
 :::details LoggerMiddleware
@@ -519,7 +519,7 @@ func (g *RealUUIDGenerator) Generate() string {
 ```
 :::
 
-## 3.main.go
+## 4-3.main.go
 - 今回の記事の趣旨はロギングのMiddleware実装のため、handler側は簡易的にmainに統合している。
 ```go
 package main
@@ -570,7 +570,7 @@ func main() {
 
 ```
 
-## 参考
+# 5.参考
 https://github.com/golang-standards/project-layout
 https://gin-gonic.com/ja/docs/examples/custom-log-format/
 https://gin-gonic.com/ja/docs/examples/custom-middleware/
