@@ -3,7 +3,7 @@ title: "GoにおけるCORSの認可処理の実装パターン"
 emoji: "📘"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Go", "CORS"]
-published: true
+published: false
 ---
 ![](/images/go/go_logo.png =450x)
 
