@@ -18,8 +18,8 @@ published: false
   - テストコードでMockを使用したいため。
 - パフォーマンスを図る指標として、レスポンスの際にレイテンシーも取得すること。
 - エンドポイントによってはログを残さないよう設定できること。
-- 予め指定したリクエストボディーの値はマスク出来るようにする
-- リクエストボディーのMaxのサイズを指定できる
+- 予め指定したリクエストボディの値はマスク出来るようにする
+- リクエストボディのMaxのサイズを指定できる
   - Maxサイズを超過するデータはログに記録されない。
   - ログの肥大化を防ぐための設定で、エラーにならず後続のハンドラーはボディを受け取ることができる。
 - 分散トレーシングのためにリクエストIDを振り分ける。
@@ -402,8 +402,8 @@ func shouldSkip(path string, skipPaths []string) bool {
 ```
 :::
 
-### 特定のContent-Typeのボディーのみ表示させる
-::: details 特定のContent-Typeがリクエストボディーに含まれているか判定
+### 特定のContent-Typeのボディのみ表示させる
+::: details 特定のContent-Typeがリクエストボディに含まれているか判定
 ```go
 func shouldLogBody(contentType string) bool {
 	allowedTypes := []string{
@@ -526,6 +526,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	// このパスは環境に応じて置き換えてください。
 	"github.com/takehiro1111/gin-api/tasks/internal/middleware"
 	"net/http"
 	"os"
