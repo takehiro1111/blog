@@ -75,10 +75,12 @@ time=2025-10-21T15:43:26.971+09:00 level=INFO msg=[Req] method=GET path=/test qu
 time=2025-10-21T15:43:26.971+09:00 level=INFO msg=[Res] method=GET path=/test query="" status=200 latency=0.46ms ip=::1 response_size=13 request_id=bbfcab14-f074-4666-9908-d46453332262
 [GIN] 2025/10/21 - 15:43:26 | 200 |     475.167µs |             ::1 | GET      "/test"
 
-# GET /test2はログを残さないよう意図的に除外設定を入れているため、表示されない。
+# GET /test2
+# ログを残さないよう意図的に除外設定を入れているため、表示されない。
 [GIN] 2025/10/21 - 15:43:29 | 200 |      18.375µs |             ::1 | GET      "/test2"
 
-# POST /users そんなエンドポイントは設定してないので404になっている。
+# POST /users 
+# そんなエンドポイントはhandler側で設定してないぞ！ということで`404`になっている。
 # 4xx系はWARNで表示されることを確認。
 time=2025-10-21T15:43:36.093+09:00 level=INFO msg=[Req] method=POST path=/api/v1/users query="" ip=::1 user_agent=curl/8.7.1 request_id=1695b81a-1c21-4bf9-a604-b015302682f7 request_body="{\"email\":\"john@example.com\",\"username\":\"john\"}"
 time=2025-10-21T15:43:36.093+09:00 level=WARN msg=[Res] method=POST path=/api/v1/users query="" status=404 latency=0.09ms ip=::1 response_size=-1 request_id=1695b81a-1c21-4bf9-a604-b015302682f7
