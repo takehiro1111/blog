@@ -3,7 +3,7 @@ title: "Go + Gin slogパッケージを用いたミドルウェア実装"
 emoji: "📝"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Go","Gin", "slog"]
-published: false
+published: true
 ---
 
 # 記事を書いた背景
