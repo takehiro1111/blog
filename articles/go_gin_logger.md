@@ -90,8 +90,8 @@ time=2025-10-21T15:43:36.093+09:00 level=WARN msg=[Res] method=POST path=/api/v1
 - 今回はGin専用のMiddlewareで内部的にしか使用しないパッケージとして作成したいため、以下を参考にルートで`/internal`を切って、その配下で実装しました。
 https://github.com/golang-standards/project-layout
 
-
 - プロジェクト配下にある`tmp`はairを実行した際に動的に作成されるため気にせずでOK！
+- 今回の記事ではテストは記述していません。
 ```zsh
 ├── go.mod
 ├── go.sum
