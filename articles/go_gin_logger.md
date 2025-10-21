@@ -110,7 +110,7 @@ https://github.com/golang-standards/project-layout
 ```
 
 ## 4-2.logger.go
-### Middleware側の処理の完全版
+### Middleware側の処理
 
 :::details 完成系
 ```go
