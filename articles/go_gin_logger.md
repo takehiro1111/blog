@@ -1,5 +1,5 @@
 ---
-title: "Go + Gin slogパッケージを用いたミドルウェア実装"
+title: "Go/Ginでslogを使ったロギングのミドルウェア実装"
 emoji: "📝"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Go","Gin", "slog"]
