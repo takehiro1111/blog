@@ -83,7 +83,7 @@ sequenceDiagram
 - ボタンを押下するとAPIサーバをフェッチして最終的に署名付きURLで直接S3から画像データを取得、表示しています。
 
 - 今回は検証目的のため、Authorization ヘッダーには固定値を設定していますが、本番環境では適切な認証トークンを使用してください。
-```tsx:./components/Cors.tsx
+```tsx:{project_root}/src/components/Cors.tsx
 import { useState } from "react";
 
 export const CorsTest = () => {
@@ -149,7 +149,7 @@ export const CorsTest = () => {
 
 ```
 
-```tsx:./App.tsx
+```tsx:{project_root}/src/App.tsx
 import { CorsTest } from "@/components/Cors";
 
 function App() {
@@ -168,7 +168,7 @@ export default App;
 ### バックエンド
 - API側でCORS制御を行い、問題なければS3の署名付きURLの発行を行なっています。
 
-```go:./routes/s3.go
+```go:./tasks/{task12-cors}/routes/s3.go
 package routes
 
 import (
@@ -233,7 +233,7 @@ func GetS3FIle(c *gin.Context) {
 ```
 
 ###  `AllowOrigins`で`localhost:3086`以外のリクエストを拒否する。
-```go:main.go
+```go:./tasks/{task12-cors}/main.go
 
 package main
 
