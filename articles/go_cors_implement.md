@@ -278,8 +278,8 @@ func main() {
 ```
 
 ## 確認
-- ボタンをクリックしたらS3に格納した画像(今回はS3のロゴ)の確認ができるます。
-![](/images/go_cors/get_s3.png =450x)
+- ボタンをクリックしたらS3に格納した画像(今回はS3のロゴ)の確認ができました。
+![](/images/go_cors/get_s3-2.png =450x)
 
 ## 参考
 https://pkg.go.dev/github.com/aws/aws-sdk-go-v2
