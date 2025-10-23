@@ -232,6 +232,7 @@ func GetS3FIle(c *gin.Context) {
 
 ```
 
+###  `AllowOrigins`で`localhost:3086`以外のリクエストを拒否する。
 ```go:main.go
 
 package main
