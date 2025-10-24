@@ -78,6 +78,13 @@ sequenceDiagram
 	Browser->>Browser: 画像表示<br/>(<img>タグに設定)
 ```
 
+### 4-5.インフラ側の認証
+- 事前にインフラ側(今回はAWS)の認証をクリアしておくこと。
+ - 今回のケースではテスト用にローカルに埋め込んでいるSSOで一時的なセッショントークンを使用しているため、以下コマンドを事前に入力してブラウザで承認しました。
+ - 実際にECSやLambdaでデプロイする場合だとIAMロールで制御します。
+ ```zsh
+	aws sso login --profile {profile_name}
+ ```
 
 ### 4-4.フロントエンド(TypeScript + React)
 - ボタンを押下するとAPIサーバをフェッチして最終的に署名付きURLで直接S3から画像データを取得、表示しています。
@@ -279,8 +286,18 @@ func main() {
 ```
 
 ## 確認
+### 許可
+- フロントのサーバを`3086`で起動し、APIを叩く
 - ブラウザでボタンをクリックすると、APIサーバのCORS制御を経由して、S3に格納した画像(今回はS3のロゴ)が返ることを確認できました。
 ![](/images/go_cors/get_s3.png =450x)
+
+### 拒否
+- バックエンド側で`AllowOrigins`の許可設定から`3086`を削除する。(他のポート番号にしてみる)
+```go
+// 3086を指定しない
+AllowOrigins:     []string{"http://localhost:10000"}, 
+```
+![](/images/go_cors/get_s3_err.png =450x)
 
 ## 参考
 https://pkg.go.dev/github.com/aws/aws-sdk-go-v2
