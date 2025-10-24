@@ -297,6 +297,12 @@ func main() {
 // 3086を指定しない
 AllowOrigins:     []string{"http://localhost:10000"}, 
 ```
+
+- CORSエラーが返ることを確認できました。
+```md
+GET Error: CORS error or network error. Check browser console for details.
+```
+
 ![](/images/go_cors/get_s3_err.png =450x)
 
 ## 参考
