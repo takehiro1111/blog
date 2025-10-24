@@ -26,6 +26,7 @@ published: true
 
 ### 3-2.書かないこと
 - CORSの詳細については既に分かりやすい記事はありますので、以下あたりを参照ください。
+https://qiita.com/att55/items/2154a8aad8bf1409db2b
 https://qiita.com/Hirohana/items/9b5501c561954ad32be7
 
 ## 4.実装
