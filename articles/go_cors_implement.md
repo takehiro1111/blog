@@ -25,7 +25,7 @@ published: true
 最終的にフロントエンドからCORSのリクエストが許可、拒否されていることを確認していきたいと思います。
 
 ### 3-2.書かないこと
-- CORSの詳細については既に分かりやすい記事はありますので、以下あたりを参照ください。
+- CORSの詳細については既に分かりやすい記事はありますので、以下あたりをご参照ください。
 @[card](https://qiita.com/att55/items/2154a8aad8bf1409db2b)
 @[card](https://qiita.com/Hirohana/items/9b5501c561954ad32be7)
 
