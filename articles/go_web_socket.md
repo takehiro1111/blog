@@ -517,12 +517,12 @@ Connected (press CTRL+C to quit)
 #### ブラウザ
 
 - 自身のクライアントで送信したメッセージがサーバーを経由して自身に返ってきている
-  ![](/images/go_websocket/echo.png =450x)
+  ![](/images/go_websocket/echo.png =600x)
 
 ### Chat サーバー
 
 - 各クライアントで送信したメッセージがサーバーを経由して、送信元を含む接続中の全クライアントに配信されている
-  ![](/images/go_websocket/chat.png =450x)
+  ![](/images/go_websocket/chat.png =600x)
 
 ## 参考
 
