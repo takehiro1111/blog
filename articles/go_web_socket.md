@@ -1,5 +1,5 @@
 ---
-title: "Goで実装するWebSocket(Chat/Echo)"
+title: "WebSocket入門：GoでEcho/Chat機能を実装してみた"
 emoji: "👌"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Go", "Gin", "WebSocket", "TypeScript", "React"]
