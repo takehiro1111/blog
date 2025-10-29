@@ -224,7 +224,11 @@ func main() {
 	flag.Parse()
 
 	router.GET("/ws", r.ChatServer)
-	router.GET("/echo", r.EchoServer)
+
+	timeProvider := r.NewRealTimeProvider()
+	router.GET("/echo", func(c *gin.Context) {
+		r.EchoServer(c, timeProvider)
+	})
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -305,7 +309,22 @@ const (
 	writeWait   = 10 * time.Second
 )
 
-func EchoServer(c *gin.Context) {
+// テストのことを考えて時間取得は外部から注入する。
+type TimeProvider interface {
+	Now() time.Time
+}
+
+type RealTimeProvider struct{}
+
+func (r *RealTimeProvider) Now() time.Time {
+	return time.Now()
+}
+
+func NewRealTimeProvider() *RealTimeProvider {
+	return &RealTimeProvider{}
+}
+
+func EchoServer(c *gin.Context, timeProvider TimeProvider) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
@@ -321,11 +340,11 @@ func EchoServer(c *gin.Context) {
 	}
 
 	// 初期接続時のReadDeadlineを設定
-	conn.SetReadDeadline(time.Now().Add(readTimeout))
+	conn.SetReadDeadline(timeProvider.Now().Add(readTimeout))
 
 	conn.SetPongHandler(func(string) error {
 		log.Println("pong received")
-		conn.SetReadDeadline(time.Now().Add(readTimeout))
+		conn.SetReadDeadline(timeProvider.Now().Add(readTimeout))
 		return nil
 	})
 
@@ -342,7 +361,7 @@ func EchoServer(c *gin.Context) {
 			}
 			log.Printf("recv: %s", msg)
 			// 受信したメッセージをそのまま送り返すechoを実行
-			conn.SetWriteDeadline(time.Now().Add(writeWait))
+			conn.SetWriteDeadline(timeProvider.Now().Add(writeWait))
 			err = conn.WriteMessage(mt, msg)
 			if err != nil {
 				log.Println("echo write:", err)
@@ -365,7 +384,7 @@ func EchoServer(c *gin.Context) {
 				return
 
 			case <-pingTicker.C:
-				conn.SetWriteDeadline(time.Now().Add(writeWait))
+				conn.SetWriteDeadline(timeProvider.Now().Add(writeWait))
 				err := conn.WriteMessage(websocket.PingMessage, nil)
 				if err != nil {
 					log.Println("write:", err)
