@@ -170,6 +170,81 @@ export default useWebSocket;
 
 :::
 
+::: details src/styles/websocket.module.css
+
+```css
+.chatContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(245, 245, 245, 0.9);
+  z-index: 1000;
+}
+
+.chatBox {
+  width: 500px;
+  height: 600px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.chatTitle {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  margin: 0;
+}
+
+.messagesArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.message {
+  padding: 8px;
+  margin-bottom: 8px;
+  background: #e3f2fd;
+  border-radius: 4px;
+}
+
+.inputArea {
+  display: flex;
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
+  gap: 8px;
+}
+
+.messageInput {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.sendButton {
+  padding: 8px 16px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sendButton:hover {
+  background: #1565c0;
+}
+
+```
+:::
+
 ::: details src/App.tsx
 
 ```tsx
