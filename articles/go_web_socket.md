@@ -523,7 +523,7 @@ Connected (press CTRL+C to quit)
 - 各クライアントで送信したメッセージがサーバーを経由して、送信元を含む接続中の全クライアントに配信されている
 - 異なるポート番号のクライアントでいずれかのクライアントから送信したメッセージが同時に表示される。
 	- 左: https://localhost:3086/app
-	- 右:https://localhost:3087/app 
+	- 右: https://localhost:3087/app 
 
   ![](/images/go_websocket/chat.png =600x)
 
