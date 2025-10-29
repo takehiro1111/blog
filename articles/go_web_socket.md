@@ -26,7 +26,7 @@ WebSocket の実装が初めてだったこともあり、整理しておこう�
 同じサーバーに対して複数のクライアントが同じメッセージを即座に共有できますよね。
 あれを実現するためのプロトコルです。
 最初は`HTTP`でハンドシェイクを行い、その後に双方向通信が可能な WebSocket プロトコル（`ws://` or `wss://`）に切り替わります。
-詳細はアカデミックな記述のあるドキュメントとか記事を確認いただいた方が良いです。
+厳密に概念を理解したい場合は以下の記事を確認いただいた方が良いです。
 @[card](https://developer.mozilla.org/ja/docs/Web/API/WebSockets_API)
 @[card](https://www.tohoho-web.com/ex/websocket.html)
 @[card](https://zenn.dev/nameless_sn/articles/websocket_tutorial)
