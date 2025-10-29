@@ -525,7 +525,7 @@ Connected (press CTRL+C to quit)
 	- 左: https://localhost:3086/app
 	- 右: https://localhost:3087/app 
 
-  ![](/images/go_websocket/chat.png =600x)
+  ![](/images/go_websocket/chat.png =800x)
 
 ## 参考
 
