@@ -196,8 +196,6 @@ export default App;
 ::: details ./main.go
 
 ```go
-// ref: https://github.com/gorilla/websocket/tree/main/examples/echo
-
 package main
 
 import (
