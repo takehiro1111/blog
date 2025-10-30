@@ -298,21 +298,11 @@ func main() {
 	var port = flag.String("port", "8080", "server port")
 	flag.Parse()
 
-	timeProvider := r.NewRealTimeProvider()
-	hub := r.NewHub(timeProvider)
-	go hub.Run()
-
-	router.GET("/ws", hub.ChatServer)
-	
-	router.GET("/echo", func(c *gin.Context) {
-		r.EchoServer(c, timeProvider)
-	})
-
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"https://localhost:3086/app", "https://localhost:3087/app"},
+		AllowOrigins: []string{"https://localhost:3086", "https://localhost:3087"},
 		AllowMethods: []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization", "X-CSRF-Token", "Cache-Control", "ETag"},
 
@@ -320,6 +310,16 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
+	timeProvider := r.NewRealTimeProvider()
+	hub := r.NewHub(timeProvider)
+	go hub.Run()
+
+	router.GET("/ws", hub.ChatServer)
+
+	router.GET("/echo", func(c *gin.Context) {
+		r.EchoServer(c, timeProvider)
+	})
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", *port),
