@@ -363,10 +363,39 @@ func main() {
 
 :::
 
-### 5-2-1.Echo
+### 5-2-1.Echo(1対1)
 
 - echo の処理については、ping/pong も実装してクライアントサーバー間で適切に接続を維持する処理も入れています。
 
+```mermaid
+sequenceDiagram
+	participant Client as クライアント(localhost:3086)
+	participant Server as サーバー(localhost:8080)
+	
+	Client->>Server: WebSocket接続リクエスト (HTTP Upgrade)
+	Server->>Client: 接続確立 (WebSocket)
+	
+	Note over Server: ReadDeadline設定<br/>Pongハンドラー登録
+	
+	par メッセージ送受信
+			Client->>Server: メッセージ送信
+			Server->>Server: メッセージ受信
+			Server->>Client: 同じメッセージをエコーバック
+	and Ping/Pong (接続監視)
+			loop 54秒ごと
+					Server->>Client: Ping送信
+					Client->>Server: Pong応答
+					Note over Server: ReadDeadline更新
+			end
+	end
+	
+	Note over Client: 接続終了
+	Client->>Server: 切断通知
+	Server->>Server: コネクションクローズ<br/>goroutine終了
+```
+
+- `Ping` → サーバーからクライアントへの問い合わせ
+- `Pong` → クライアントからサーバーへの応答
 ```go:./routes/echo.go
 package routes
 
@@ -380,8 +409,6 @@ import (
 )
 
 const (
-	// Ping → サーバーからクライアントへの問い合わせ
-	// Pong → クライアントからサーバーへの応答
 	readTimeout = 60 * time.Second       // Pong(メッセージ/Pong受信のタイムアウト)
 	pingPeriod  = (readTimeout * 9) / 10 // Ping間隔（54秒 = 60秒の90%）
 	writeWait   = 10 * time.Second
@@ -482,10 +509,45 @@ func sendPeriodicPing(conn *websocket.Conn, timeProvider TimeProvider, done chan
 
 ```
 
-### 5-2-2.チャット
+### 5-2-2.チャット(N対N)
+```mermaid
+sequenceDiagram
+	participant Client1 as クライアント1(localhost:3086)
+	participant Client2 as クライアント2(localhost:3087)
+	participant Server as サーバー(localhost:8080)
+	
+	Note over Server: Hub起動<br/>Run() goroutine開始
+	
+	Client1->>Server: WebSocket接続リクエスト
+	Server->>Server: register チャネルへ送信
+	Server->>Server: clientsマップに追加
+	
+	Client2->>Server: WebSocket接続リクエスト
+	Server->>Server: register チャネルへ送信
+	Server->>Server: clientsマップに追加
+	
+	Note over Server: 2つのクライアントが接続済み
+	
+	Client1->>Server: メッセージ送信 ("Hello")
+	Server->>Server: broadcast チャネルへ送信
+	Server->>Server: clientsマップを確認
+	Server->>Client1: "Hello" 配信
+	Server->>Client2: "Hello" 配信
+	
+	Client2->>Server: メッセージ送信 ("Hi")
+	Server->>Server: broadcast チャネルへ送信
+	Server->>Server: clientsマップを確認
+	Server->>Client1: "Hi" 配信
+	Server->>Client2: "Hi" 配信
+	
+	Note over Client1: 接続終了
+	Client1->>Server: 切断通知
+	Server->>Server: unregister チャネルへ送信
+	Server->>Server: clientsマップから削除<br/>コネクションクローズ
+```
 
 :::message
-**init 関数について**: パッケージ初期化時に `WriteMessages` goroutine を起動し、
+**init 関数について**: パッケージ初期化時に `WriteMessages` を起動し、
 broadcast チャネルからのメッセージ配信を常時監視します。
 :::
 
