@@ -296,11 +296,11 @@ func main() {
 	var port = flag.String("port", "8080", "server port")
 	flag.Parse()
 
-	router.GET("/ws", r.ChatServer)
+	router.GET("/ws", r.HandleChatServer)
 
 	timeProvider := r.NewRealTimeProvider()
 	router.GET("/echo", func(c *gin.Context) {
-		r.EchoServer(c, timeProvider)
+		r.HandleEchoServer(c, timeProvider)
 	})
 
 	interrupt := make(chan os.Signal, 1)
@@ -382,7 +382,7 @@ const (
 	writeWait   = 10 * time.Second
 )
 
-// テストのことを考えて時間取得は外部から注入する。
+// ユニットテストでモックを使用できるようinterfaceを用いて外部から注入している
 type TimeProvider interface {
 	Now() time.Time
 }
@@ -397,7 +397,7 @@ func NewRealTimeProvider() *RealTimeProvider {
 	return &RealTimeProvider{}
 }
 
-func EchoServer(c *gin.Context, timeProvider TimeProvider) {
+func HandleEchoServer(c *gin.Context, timeProvider TimeProvider) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
@@ -423,53 +423,56 @@ func EchoServer(c *gin.Context, timeProvider TimeProvider) {
 
 	done := make(chan struct{})
 
-	go func() {
-		defer conn.Close()
-		defer close(done)
-		for {
-			mt, msg, err := conn.ReadMessage()
-			if err != nil {
-				log.Println("read err:", err)
-				return
-			}
-			log.Printf("recv: %s", msg)
-			// 受信したメッセージをそのまま送り返すechoを実行
-			conn.SetWriteDeadline(timeProvider.Now().Add(writeWait))
-			err = conn.WriteMessage(mt, msg)
-			if err != nil {
-				log.Println("echo write:", err)
-				return
-			}
-			log.Printf("echo: %s", msg)
-		}
-	}()
-
-	go func() {
-		pingTicker := time.NewTicker(pingPeriod)
-		defer func() {
-			pingTicker.Stop()
-			conn.Close()
-		}()
-
-		for {
-			select {
-			case <-done:
-				return
-
-			case <-pingTicker.C:
-				conn.SetWriteDeadline(timeProvider.Now().Add(writeWait))
-				err := conn.WriteMessage(websocket.PingMessage, nil)
-				if err != nil {
-					log.Println("write:", err)
-					return
-				}
-				log.Println("ping sent")
-			}
-		}
-	}()
+	go readAndEcho(conn, timeProvider, done)
+	go sendPeriodicPing(conn, timeProvider, done)
 
 	// チャネルがクローズされるまで待機
 	<-done
+}
+
+func readAndEcho(conn *websocket.Conn, timeProvider TimeProvider, done chan struct{}) {
+	defer conn.Close()
+	defer close(done)
+	for {
+		mt, msg, err := conn.ReadMessage()
+		if err != nil {
+			log.Println("read err:", err)
+			return
+		}
+		log.Printf("recv: %s", msg)
+		// 受信したメッセージをそのまま送り返すechoを実行
+		conn.SetWriteDeadline(timeProvider.Now().Add(writeWait))
+		err = conn.WriteMessage(mt, msg)
+		if err != nil {
+			log.Println("echo write:", err)
+			return
+		}
+		log.Printf("echo: %s", msg)
+	}
+}
+
+func sendPeriodicPing(conn *websocket.Conn, timeProvider TimeProvider, done chan struct{}) {
+	pingTicker := time.NewTicker(pingPeriod)
+	defer func() {
+		pingTicker.Stop()
+		conn.Close()
+	}()
+
+	for {
+		select {
+		case <-done:
+			return
+
+		case <-pingTicker.C:
+			conn.SetWriteDeadline(timeProvider.Now().Add(writeWait))
+			err := conn.WriteMessage(websocket.PingMessage, nil)
+			if err != nil {
+				log.Println("write:", err)
+				return
+			}
+			log.Println("ping sent")
+		}
+	}
 }
 
 ```
@@ -504,11 +507,12 @@ type Message struct {
 	Message []byte
 }
 
+// パッケージ初期化時に `WriteMessages` goroutine を起動し、broadcast チャネルからのメッセージ配信を常時監視。
 func init() {
-	go WriteMessages(broadcast, clients)
+	go broadcastToClients(broadcast, clients)
 }
 
-func ChatServer(c *gin.Context) {
+func HandleChatServer(c *gin.Context) {
 	// HTTP接続をWebSocket接続に切り替える
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -539,10 +543,10 @@ func ChatServer(c *gin.Context) {
 	clients[conn] = true
 	mu.Unlock()
 
-	ReadMessages(conn, broadcast)
+	readAndToBroadcast(conn, broadcast)
 }
 
-func ReadMessages(conn *websocket.Conn, broadcast chan Message) {
+func readAndToBroadcast(conn *websocket.Conn, broadcast chan Message) {
 	// 無限ループさせることでクライアントからのメッセージを受け付けられる状態にする
 	// クライアントとのコネクションが切れた場合はReadMessage()関数からエラーが返る
 	for {
@@ -556,7 +560,7 @@ func ReadMessages(conn *websocket.Conn, broadcast chan Message) {
 }
 
 // broadcastにメッセージがあれば、clientsに格納されている全てのコネクションへ送信する
-func WriteMessages(broadcast chan Message, clients map[*websocket.Conn]bool) {
+func broadcastToClients(broadcast chan Message, clients map[*websocket.Conn]bool) {
 	for {
 		message := <-broadcast
 		mu.Lock()
