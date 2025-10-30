@@ -385,7 +385,7 @@ sequenceDiagram
 			loop 54秒ごと
 					Server->>Client: Ping送信
 					Client->>Server: Pong応答
-					Note over Server: ReadDeadline更新
+					Note over Server: ReadDeadline更新(接続を維持)
 			end
 	end
 	
