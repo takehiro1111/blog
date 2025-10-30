@@ -3,14 +3,14 @@ title: "WebSocket入門：GoでEcho/Chat機能を実装してみた"
 emoji: "👌"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Go", "Gin", "WebSocket", "TypeScript", "React"]
-published: false
+published: true
 ---
 
 ![](/images/go/go_logo.png =450x)
 
 ## 1.記事を書いた背景
 
-WebSocket の実装が初めてだったこともあり、整理しておこうと思い記事にしました。
+WebSocket の実装が初めてだったこともあり、頭の中を整理しておこうと思い記事にしました。
 全然関係ないですが、1 年くらい前にプロダクトへサーバレス構成でチャット機能を実装する時にインフラ側の基盤を作ったのが懐かしく感じました。
 
 ## 2.対象読者
@@ -89,7 +89,7 @@ import styles from "@/styles/websocket.module.css";
 
 const API_CONF = {
   DOMAIN: "wss://localhost:8080",
-  PATH: "/echo", // パスは、/wsに変更するとchatの処理に切り替わる
+  PATH: "/echo", // /wsに変更するとchatの処理に切り替わる
 } as const;
 
 export const WebSocketClient = () => {
@@ -268,6 +268,8 @@ export default App;
 - main はそれぞれの route の指定と異なるオリジンを許可する CORS 制御,グレースフルシャットダウン等を実装しています。  
   ここも共通なのでインラインで記述します。
 
+- 今回の実装ではDBの永続化は行なっていません。メモリでデータを持っています。
+
 ::: details ./main.go
 
 ```go
@@ -296,9 +298,12 @@ func main() {
 	var port = flag.String("port", "8080", "server port")
 	flag.Parse()
 
-	router.GET("/ws", r.HandleChatServer)
-
 	timeProvider := r.NewRealTimeProvider()
+	hub := r.NewHub(timeProvider)
+	go hub.Run()
+
+	router.GET("/ws", hub.ChatServer)
+	
 	router.GET("/echo", func(c *gin.Context) {
 		r.HandleEchoServer(c, timeProvider)
 	})
@@ -496,24 +501,67 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var (
-	clients   = make(map[*websocket.Conn]bool)
-	broadcast = make(chan Message)
-	mu        sync.Mutex // 並行アクセス対策
-)
-
 type Message struct {
 	Type    int
 	Message []byte
 }
 
-// パッケージ初期化時に `WriteMessages` goroutine を起動し、broadcast チャネルからのメッセージ配信を常時監視。
-func init() {
-	go broadcastToClients(broadcast, clients)
+// timeProviderは、echo.goで定義している構造体を使用
+type Hub struct {
+	clients   map[*websocket.Conn]bool
+	broadcast chan Message
+	register  chan *websocket.Conn
+	unregister chan *websocket.Conn
+	mu        sync.RWMutex
+	timeProvider TimeProvider
 }
 
-func HandleChatServer(c *gin.Context) {
-	// HTTP接続をWebSocket接続に切り替える
+func NewHub(timeProvider TimeProvider) *Hub {
+	return &Hub{
+		clients:    make(map[*websocket.Conn]bool),
+		broadcast:  make(chan Message, 256), // バッファ付き
+		register:   make(chan *websocket.Conn),
+		unregister: make(chan *websocket.Conn),
+		timeProvider: timeProvider,
+	}
+}
+
+// Runをgoroutineとして常時起動させておくことで必要な場合に即座に処理される
+func (h *Hub) Run() {
+	for {
+		select {
+		// ユーザー登録するためにコネクションをclientsマップへ追加
+		case conn := <-h.register:
+			h.mu.Lock()
+			h.clients[conn] = true
+			h.mu.Unlock()
+			
+		// サーバーとの接続が切れたクライアントのデータを削除
+		case conn := <-h.unregister:
+			h.mu.Lock()
+			if _, ok := h.clients[conn]; ok {
+				delete(h.clients, conn)
+				conn.Close()
+			}
+			h.mu.Unlock()
+			
+		// broadcastへメッセージデータが入ったら各クライアントへ通知する
+		case message := <-h.broadcast:
+			h.mu.Lock()
+			for client := range h.clients {
+				err := client.WriteMessage(message.Type, message.Message)
+				if err != nil {
+					log.Printf("error: %v", err)
+					client.Close()
+					delete(h.clients, client)
+				}
+			}
+			h.mu.Unlock()
+		}
+	}
+}
+
+func (h *Hub) ChatServer(c *gin.Context) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
@@ -522,57 +570,29 @@ func HandleChatServer(c *gin.Context) {
 		},
 	}
 
-	// upgraderを呼び出すことで通常のhttp通信からwebsocketへupgrade
-	// コネクションを作成する
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		log.Printf("Failed to set websocket upgrade: %+v\n", err)
+		log.Printf("Failed to upgrade: %+v\n", err)
 		return
 	}
 
-	// コネクションの終了とclients マップに接続を残さないようクリーンアップ処理を実装している
+	h.register <- conn
+
 	defer func() {
-		mu.Lock()
-		delete(clients, conn)
-		mu.Unlock()
-		conn.Close()
+		h.unregister <- conn
 	}()
 
-	// コネクションをclientsマップへ追加
-	mu.Lock()
-	clients[conn] = true
-	mu.Unlock()
-
-	readAndToBroadcast(conn, broadcast)
+	h.readAndBroadcast(conn)
 }
 
-func readAndToBroadcast(conn *websocket.Conn, broadcast chan Message) {
-	// 無限ループさせることでクライアントからのメッセージを受け付けられる状態にする
-	// クライアントとのコネクションが切れた場合はReadMessage()関数からエラーが返る
+func (h *Hub) readAndBroadcast(conn *websocket.Conn) {
 	for {
 		mt, msg, err := conn.ReadMessage()
 		if err != nil {
-			log.Printf("ReadMessage Error. ERROR: %+v\n", err)
+			log.Printf("ReadMessage Error: %+v\n", err)
 			break
 		}
-		broadcast <- Message{Type: mt, Message: msg}
-	}
-}
-
-// broadcastにメッセージがあれば、clientsに格納されている全てのコネクションへ送信する
-func broadcastToClients(broadcast chan Message, clients map[*websocket.Conn]bool) {
-	for {
-		message := <-broadcast
-		mu.Lock()
-		for client := range clients {
-			err := client.WriteMessage(message.Type, message.Message)
-			if err != nil {
-				log.Printf("error: %v", err)
-				client.Close()
-				delete(clients, client)
-			}
-		}
-		mu.Unlock()
+		h.broadcast <- Message{Type: mt, Message: msg}
 	}
 }
 
