@@ -305,7 +305,7 @@ func main() {
 	router.GET("/ws", hub.ChatServer)
 	
 	router.GET("/echo", func(c *gin.Context) {
-		r.HandleEchoServer(c, timeProvider)
+		r.EchoServer(c, timeProvider)
 	})
 
 	interrupt := make(chan os.Signal, 1)
@@ -402,7 +402,7 @@ func NewRealTimeProvider() *RealTimeProvider {
 	return &RealTimeProvider{}
 }
 
-func HandleEchoServer(c *gin.Context, timeProvider TimeProvider) {
+func EchoServer(c *gin.Context, timeProvider TimeProvider) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
