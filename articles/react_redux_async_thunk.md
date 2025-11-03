@@ -421,4 +421,4 @@ export const fetchUsers = createAsyncThunk("users/fetchAll", async () => {
 @[card](https://redux.js.org/tutorials/essentials/part-2-app-structure)
 @[card](https://qiita.com/TaikiTkwkbysh/items/da1d75b2049040d63a9a)
 @[card](https://qiita.com/jima-r20/items/7fee2f00dbd1f302e373)
-
+@[card](https://typescriptbook.jp/reference/type-reuse/utility-types/return-type)
