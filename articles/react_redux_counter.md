@@ -155,33 +155,35 @@ export default store;
 ::: details components/basic/{local_dir}/feature/UserSlice.tsx
 
 ```tsx:UserSlice.tsx
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
-  type User,
-  type UsersState,
-} from "@/components/basic/Question74/types/User";
+  createAsyncThunk,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
+import { type UsersState } from "@/components/basic/{local_dir}/types/User";
 import axios from "axios";
 
 // 手動でガードしなくて良いため、axiosを使用。
 export const fetchUsers = createAsyncThunk("users/fetchAll", async () => {
+  // 意図的にpendingの処理を表示したいため。
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+
   const res = await axios.get("https://jsonplaceholder.typicode.com/users");
+  console.log("res", res);
   return res.data;
 });
 
 const initialState: UsersState = {
-  users: [] as User[],
-  loading: "idle",
-  error: null as string | null,
+  users: [] as UsersState["users"],
+  loading: "idle" as UsersState["loading"],
+  error: null as UsersState["error"],
 };
 
 // Then, handle actions in your reducers:
-// ref: https://redux-toolkit.js.org/api/createAsyncThunk
 const usersSlice = createSlice({
   name: "users",
   initialState,
-  // 同期的なアクション（カウンターアプリなど）がない場合は空でOK
   reducers: {},
- // 非同期処理は extraReducers で定義
   extraReducers: (builder) => {
     // Add reducers for additional action types here, and handle loading state as needed
     builder
@@ -189,14 +191,20 @@ const usersSlice = createSlice({
         state.loading = "pending";
         state.error = null;
       })
-      .addCase(fetchUsers.fulfilled, (state, action): void => {
-        state.loading = "succeeded";
-        state.users = action.payload;
-      })
-      .addCase(fetchUsers.rejected, (state, action): void => {
-        state.loading = "failed";
-        state.error = action.error.message || "Failed to fetch users";
-      });
+      .addCase(
+        fetchUsers.fulfilled,
+        (state, action: PayloadAction<UsersState["users"]>): void => {
+          state.loading = "succeeded";
+          state.users = action.payload;
+        }
+      )
+      .addCase(
+        fetchUsers.rejected,
+        (state, action: ReturnType<typeof fetchUsers.rejected>): void => {
+          state.loading = "failed";
+          state.error = action.error.message || "Failed to fetch users";
+        }
+      );
   },
 });
 
@@ -216,7 +224,7 @@ export default usersSlice.reducer;
 ```tsx:UserSelector.tsx
 import React from "react";
 import { useSelector } from "react-redux";
-import { type RootState } from "@/components/basic/Question74/store/store";
+import { type RootState } from "@/components/basic/{local_dir}/store/store";
 
 const UserSelector: React.FC = () => {
   const { users, loading, error } = useSelector((state: RootState) => state.userData);
@@ -259,8 +267,8 @@ export default UserSelector;
 ```tsx:userDispatch.tsx
 import React from "react";
 import { useDispatch } from "react-redux";
-import { fetchUsers } from "@/components/basic/Question74/features/UsersSlice";
-import { type AppDispatch } from "@/components/basic/Question74/store/store";
+import { fetchUsers } from "@/components/basic/{local_dir}/features/UsersSlice";
+import { type AppDispatch } from "@/components/basic/{local_dir}/store/store";
 
 const UserDispatch: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -288,9 +296,9 @@ export default UserDispatch;
 ::: details components/basic/{local_dir}/app.tsx
 
 ```tsx:app.tsx
-import UserDispatch from "@/components/basic/Question74/features/UsersDispatch";
-import UserSelector from "@/components/basic/Question74/features/UsersSelector";
-import store from "@/components/basic/Question74/store/store";
+import UserDispatch from "@/components/basic/{local_dir}/features/UsersDispatch";
+import UserSelector from "@/components/basic/{local_dir}/features/UsersSelector";
+import store from "@/components/basic/{local_dir}/store/store";
 import { Provider } from "react-redux";
 
 const FetchUser = () => {
