@@ -1,5 +1,5 @@
 ---
-title: "Redux基礎 APIをfetchして非同期でデータを表示する処理"
+title: "Redux基礎: APIをfetchして非同期でデータを表示する処理"
 emoji: "🔖"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["TypeScript","React","Redux"]
