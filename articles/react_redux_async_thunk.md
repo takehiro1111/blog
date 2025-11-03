@@ -44,8 +44,6 @@ Reduxに不慣れな方のご参考にもなれば幸いです。
 - 全てのコンポーネントから状態を参照できる
 - 直接書き換えることはできず、必ずActionを通じて更新する
 
-::: details Storeの実装例
-
 ```ts
 // Storeの中身（例）
 const store = configureStore({
@@ -55,13 +53,29 @@ const store = configureStore({
 });
 ```
 
-:::
-
 ### 6-2.Action
 #### 役割: 「何が起きたか」を表す指示書
 - 必ず type プロパティを持つオブジェクト
 - 状態変更のリクエストをStoreに送る
 - 追加のデータ（payload）を含めることもできる
+
+```tsx
+// 実際のAction
+fetchUsers.pending 
+fetchUsers.fulfilled
+fetchUsers.rejected
+
+// Action Creator
+export const fetchUsers = createAsyncThunk("users/fetchAll", async () => {
+  const res = await axios.get("https://jsonplaceholder.typicode.com/users");
+  return res.data;
+});
+```
+
+```tsx
+// ボタンクリックなどのイベントからdispatch()が実行されるとActionが発火する
+dispatch(fetchUsers());
+```
 
 ### 6-3.Reducer
 #### 役割: Actionに応じて状態をどう変更するかの関数
@@ -70,22 +84,55 @@ const store = configureStore({
 - 純粋関数である必要がある（同じ入力には常に同じ出力）
 - 元の状態を直接変更してはいけない（イミュータブル）
 
+```tsx
+const usersSlice = createSlice({
+  name: "users",
+  initialState,
+  // 同期処理の場合は reducersを設定する。
+  reducers: {},
+  extraReducers: (builder) => {
+    // Add reducers for additional action types here, and handle loading state as needed
+    builder
+      .addCase(fetchUsers.pending, (state): void => {
+        state.loading = "pending";
+        state.error = null;
+      })
+      .addCase(
+        fetchUsers.fulfilled,
+        (state, action: PayloadAction<UsersState["users"]>): void => {
+          state.loading = "succeeded";
+          state.users = action.payload;
+        }
+      )
+      .addCase(
+        fetchUsers.rejected,
+        (state, action: ReturnType<typeof fetchUsers.rejected>): void => {
+          state.loading = "failed";
+          state.error = action.error.message || "Failed to fetch users";
+        }
+      );
+  },
+});
+
+```
+
 ## 7.データの流れ
 ```mermaid
 flowchart LR
-    A[ユーザー操作] --> B[Action]
-    B --> C[dispatch]
-    C --> D[Store]
-    D --> E[Reducer]
-    E --> F[Store更新]
-    F --> G[再レンダリング]
-    
-    style A fill:#e1f5ff
-    style D fill:#ffe1e1
-    style G fill:#e1ffe1
+  A[ユーザー操作] --> B[Action]
+  B --> C[dispatch]
+  C --> D[Store]
+  D --> E[Reducer]
+  E --> F[Store更新]
+  F --> G[再レンダリング]
+  
+  style A fill:#e1f5ff
+  style D fill:#ffe1e1
+  style G fill:#e1ffe1
 ```
 
 ```md
+## 処理の順序
 1. ユーザー操作: ボタンクリックなどのイベント発生
 2. Action 作成: 何が起きたかを表すオブジェクトを作る
 3. dispatch: Action を Store に送る
@@ -94,6 +141,29 @@ flowchart LR
 6. Store 更新: 新しい状態を保存
 7. 再レンダリング: 変更を検知したコンポーネントが更新
 8. 画面反映: ユーザーに結果が表示される
+
+## 今回のケース
+1. ユーザー操作
+<button onClick={handleFetchUsers}>
+
+2. Action Creator実行
+dispatch(fetchUsers())
+
+3. Actionが生成される
+{ type: 'users/fetchAll/pending' }
+
+4. Reducerが反応
+builder.addCase(fetchUsers.pending, (state) => {
+  state.loading = "pending"; // ← ここがReducer
+})
+
+5. API取得完了後、新しいActionが生成
+// { type: 'users/fetchAll/fulfilled', payload: [...users] }
+
+6. 別のReducerが反応
+builder.addCase(fetchUsers.fulfilled, (state, action) => {
+  state.users = action.payload; // Reducer
+})
 ```
 
 
@@ -169,7 +239,6 @@ export const fetchUsers = createAsyncThunk("users/fetchAll", async () => {
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
   const res = await axios.get("https://jsonplaceholder.typicode.com/users");
-  console.log("res", res);
   return res.data;
 });
 
