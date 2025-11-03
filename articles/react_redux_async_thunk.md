@@ -148,10 +148,11 @@ export default store;
 
 ### 9-2. Slice の作成（Reducer + Actions）
 - ユーザーデータの取得・管理ロジックを定義
-- createAsyncThunk: 非同期処理（API呼び出し）を簡単に扱える
-- extraReducers: 非同期処理の3つの状態（pending/fulfilled/rejected）を管理
+- `createAsyncThunk`:fetch 処理を Redux のライフサイクル（pending/fulfilled/rejected）に組み込むためのヘルパー。
+- `extraReducers`: 非同期処理の3つの状態（pending/fulfilled/rejected）を管理
 @[card](https://redux-toolkit.js.org/api/createAsyncThunk)
 - loading 状態で UI を切り替える（ローディング表示など）
+
 ::: details components/basic/{local_dir}/feature/UserSlice.tsx
 
 ```tsx:UserSlice.tsx
@@ -216,7 +217,7 @@ export default usersSlice.reducer;
 
 ### 9-3. Selector でデータを取得
 - Store から状態を取り出して表示
-- useSelector: Store から必要なデータだけを取得
+- `useSelector`: Store から必要なデータだけを取得
 - loading 状態で条件分岐（idle/pending/succeeded/failed）
 - Store が更新されると自動的に再レンダリング
 ::: details components/basic/{local_dir}/feature/UserSelector.tsx
