@@ -74,7 +74,7 @@ Kubernetesクラスタ
   - 他のコンポーネント(Scheduler、Controller等)との調整
 
 @[card](https://kubernetes.io/ja/docs/concepts/overview/kubernetes-api/)
-@[card](https://findy-code.io/media/articles/technote-sanpo_shiho)
+
 #### 3-1-3.Scheduler
 > Kubernetesにおいて、スケジューリング とは、KubeletがPodを稼働させるためにNodeに割り当てることを意味します。
 - Nodeに割り当てられていないPodを監視し、稼働させるべき最適なNodeを見つけ出す責務を担う。
@@ -88,6 +88,7 @@ Kubernetesクラスタ
 これらを総合的に評価(スコアリング)して、最も適したNodeに配置します。
 
 @[card](https://kubernetes.io/ja/docs/concepts/scheduling-eviction/kube-scheduler/)
+@[card](https://findy-code.io/media/articles/technote-sanpo_shiho)
 
 #### 3-1-4.Controller Manager
 > API サーバーを介してクラスタの共有状態を監視し、現在の状態を望ましい状態に近づけるよう変更を加える制御ループを指します。
