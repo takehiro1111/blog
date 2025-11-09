@@ -53,7 +53,7 @@ Kubernetesクラスタ
 @[card](https://kubernetes.io/ja/docs/concepts/overview/components/)
 @[card](https://kubernetes.io/docs/concepts/architecture/)
 
-### 3-1.Control Plane(Master Node)
+### 3-1.Control Plane(旧称: Master Node)
 - クラスタ全体の状態を管理する。
 
 #### 3-1-1.Cluster
@@ -75,7 +75,7 @@ Kubernetesクラスタ
   - 他のコンポーネント(Scheduler、Controller等)との調整
 
 @[card](https://kubernetes.io/ja/docs/concepts/overview/kubernetes-api/)
-https://findy-code.io/media/articles/technote-sanpo_shiho
+@[card](https://findy-code.io/media/articles/technote-sanpo_shiho)
 #### 3-1-3.Scheduler
 > Kubernetesにおいて、スケジューリング とは、KubeletがPodを稼働させるためにNodeに割り当てることを意味します。
 - Nodeに割り当てられていないPodを監視し、稼働させるべき最適なNodeを見つけ出す責務を担う。
@@ -280,7 +280,7 @@ spec:
 デフォルトではBase64エンコードのみで暗号化されません。
 Production環境ではetcdの暗号化や外部シークレット管理サービス(AWS Secrets Manager等)の利用を検討してください。
 :::
-**注意**:
+
 ```yaml
 apiVersion: v1
 kind: Secret
