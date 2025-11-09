@@ -9,11 +9,7 @@ published: false
 ![](/images/kubernetes/logo.png =400x)
 
 ## 1.記事を書いた背景
-業務でEKSの環境を構築しており、知識を補完するために記事として残しています。
-
-少し脱線しますが、EKSやGKEをTerraformで構築する際、よく[公式Module](https://github.com/terraform-aws-modules/terraform-aws-eks)を使ったチュートリアルを行うと思いますが、個人的に理解する上でハードルが高いと感じています。Moduleの中身を見てもModule on Moduleの構造で抽象化されすぎていて、構成要素を直感的に掴みづらいんですよね。
-
-ただでさえ学習コストの高い技術なので、焦りすぎず一つずつ理解出来ればと思っています。
+業務でEKSの環境を構築しており、知識を補完,整理するために記事として残しています。
 
 ## 2.対象読者
 - Kubernetes初学者,未経験者(自分みたいな)
