@@ -10,6 +10,9 @@ published: true
 
 ## 1.記事を書いた背景
 業務でEKSの環境を構築しており、知識を補完,整理するために記事として残しています。
+公式のチュートリアルをサラッと対応しながら、まとめております。
+
+@[card](https://kubernetes.io/ja/docs/tutorials/)
 
 ## 2.対象読者
 - Kubernetes初学者,未経験者(自分みたいな)
