@@ -1,5 +1,5 @@
 ---
-title: "k8s超入門: コンポーネントの概要"
+title: "k8s超入門: 基本的なコンポーネントの概要解説"
 emoji: "🎉"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Kubernetes","コンテナ"]
