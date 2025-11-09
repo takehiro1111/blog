@@ -3,7 +3,7 @@ title: "k8s入門: コンポーネントの概要"
 emoji: "🎉"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Kubernetes","コンテナ"]
-published: false
+published: true
 ---
 
 ![](/images/kubernetes/logo.png =400x)
