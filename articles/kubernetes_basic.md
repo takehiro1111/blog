@@ -94,7 +94,7 @@ Kubernetesクラスタ
 セルフヒーリング機能の中核を担うコンポーネント。
 
 **具体例**
-- Deployment: 「replica: 3」と定義 → Podが2つに減った → 自動で1つ追加
+- Deployment: `replica: 3`と定義 → Podが2つに減った → 自動で1つ追加
 - Node: Nodeがダウン → 該当Node上のPodを別Nodeに再配置
 - Service: Endpointの自動更新
 
@@ -121,9 +121,6 @@ k8sクラスタの全ての設定・状態データを保存する分散デー�
 - 高可用性(複数台で冗長化)
 - 強い一貫性(データの整合性保証)
 - 全てのリソースの定義と状態がetcdに保存される
-
-**感覚的に**
-k8sクラスタの「唯一の真実の情報源(Single Source of Truth)」。etcdが壊れるとクラスタ全体が機能停止。
 
 @[card](https://kubernetes.io/ja/docs/tasks/administer-cluster/configure-upgrade-etcd/)
 @[card](https://etcd.io/)
