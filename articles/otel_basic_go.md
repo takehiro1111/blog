@@ -8,13 +8,11 @@ published: false
 
 ## 1. 本記事を書いた背景
 
-## 1. OpenTelemetryとは？
+## 2. OpenTelemetryとは？
 
-## 2. 構成要素
+## 3. 構成要素
 
-## 3. 実装
+## 4. 実装
 
-
-
-# 4. 参考
+## 5. 参考
 
