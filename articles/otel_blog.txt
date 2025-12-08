@@ -1,17 +1,9 @@
----
-title: "OpenTelemetry入門: Goによるトレース・メトリクスの収集"
-emoji: "🐷"
-type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["OpenTelemetry", "Go", "AWS"]
-published: false
----
-
 ## 1. 本記事を書いた背景
 以前から興味のあった`OpenTelemetry(Otel)`を活用したトレースやメトリクス収集に対応してみました。
-ちょうど良いタイミングでアドベントカレンダーの時期が来たため、この機会に乗っかって知識の整理として書いてます。
+ちょうど良いタイミングでアドベントカレンダーの時期が来たため、この機会に乗っかって触った後の整理としてまとめがてら書いてます。
 
 ## 2.書くこと
-- 基本的なOtelの説明, Mermaidでの図解
+- 基本的なOtelの説明, 図解
 - MiddlewareとしてのSDKの実装例
 
 ## 3.書かないこと
@@ -43,20 +35,18 @@ https://www.oreilly.co.jp/books/9784814401024/
 - `Auto Instrumentation`: コード変更なしで自動計装
 
 ### インフラ向け
-- `Collector`: テレメトリの受信・加工・転送を担うプロキシ(役割としてサイドカー的なイメージ)
+- `Collector`: テレメトリの受信・加工・転送を担うプロキシ(ECS, EKSだとサイドカー的な役割)
 - `K8s Operator / Helm Charts`: Kubernetes環境向けのデプロイツール
 
-## 6. テレメトリの種類（シグナル）
-テレメトリの種類としては、トレース、メトリクス、ログの3種類があります。
-### 6-1.トレースとは？
+### トレースとは？
 - 分散システム内での処理の流れを可視化したものです
-  - 例えば、ECサイトでユーザーが商品を購入する際、1つのリクエストがシステム内の複数のサービス（認証、在庫確認、決済など）をどのように通過していったかを示す足跡的な役割を担います
-  - どのサービスがどのサービスを呼び出したか、各処理のレイテンシーが可視化されます。これにより、ボトルネックとなっている箇所を特定できます
+  - 例えば、ECサイトでユーザーが商品を購入するとしても、1つのリクエストがシステム内の複数のサービス（認証、在庫確認、決済など）をどのように通過していったかを示す足跡的な役割を担います
+  - どのサービスがどのサービスを呼び出したか、その処理にどれくらい時間がかかったかレイテンシーが可視化され、どの処理がアプリケーションの処理遅延のボトルネックになっているか突き止めることができます
   - トレースを構成する最小単位を`Span`と言います
     - 1つのトレースは複数のSpanで構成されています
 
 #### 処理の流れ
-ユーザーが購入ボタンを押すと、まずトレース全体を表す親Spanが生成されます。  その中で認証・在庫確認・決済といった各処理が子Spanとして記録されていきます。 在庫確認の中でDBアクセスが発生すれば、それは孫Spanとしてぶら下がる形になります。 このように、1つのリクエストが通過した処理の流れが、親子関係のツリーとして可視化されるのがトレースの特徴です。
+「ユーザーが購入ボタンを押すと、まずトレース全体を表す親Spanが生成されます。  その中で認証・在庫確認・決済といった各処理が子Spanとして記録されていきます。 在庫確認の中でDBアクセスが発生すれば、それは孫Spanとしてぶら下がる形になります。 このように、1つのリクエストが通過した処理の流れが、親子関係のツリーとして可視化されるのがトレースの特徴です。
 
   ```mermaid
   flowchart TB
@@ -77,47 +67,7 @@ https://www.oreilly.co.jp/books/9784814401024/
     C --> E
   ```
 
-  #### コンテキスト伝搬とは？
-  分散システムでトレースを繋げるための「バトンパス」の仕組みです。
-
-  マイクロサービス環境では、1つのリクエストが複数のサービスを経由します。
-  このとき、「これは同じリクエストの一部だよ」という情報（Trace ID, Span ID）を次のサービスに渡さないと、トレースがバラバラになってしまいます。
-
-  ```mermaid
-  sequenceDiagram
-      participant A as サービスA
-      participant B as サービスB
-      participant C as サービスC
-      A->>B: リクエスト + traceparentヘッダー
-      B->>C: リクエスト + traceparentヘッダー
-      Note right of C: 同じTrace IDで紐づく
-  ```
-
-  ##### 運ばれる情報
-  - `Trace Context（ハードコンテキスト）` 
-    - Trace ID / Span ID
-    - トレースを成立させるための必須情報
-  - `Baggage（ソフトコンテキスト）`
-    - ユーザー定義の任意値
-    - 顧客ID、セッションIDなど、ビジネス向けメタデータ
-    - 下流すべてに転送されるため機密情報は入れない
-
-  ##### 仕組み
-  - Inject（注入）: リクエスト送信時にHTTPヘッダーへTrace ID等を書き込む
-  - Extract（抽出）: リクエスト受信時にヘッダーからTrace ID等を読み取る
-  - 標準規格：W3C Trace Context
-    - OpenTelemetryは traceparent ヘッダーを使うW3C標準を採用しています。 これにより、異なる言語・ベンダーのツール間でもトレースが途切れません。
-  `traceparent: 00-<trace-id>-<span-id>-<flags>`
-  
-  - ゼロコード計装
-    - JavaやPythonなどの言語では、エージェントやライブラリを使うことで、コンテキストの伝搬を自動的に処理してくれます。開発者が手動でヘッダーを解析する必要はないです
-
-:::note info
-スレッドが切り替わる非同期処理や、メッセージキューを介した処理では、コンテキストが途切れがちです。 別スレッドで処理を継続する場合、明示的にコンテキストを渡すか、OpenTelemetryが提供するラッパー（wrap()メソッドなど）を使用する必要があります。
-:::
-
-
-### 6-2.メトリクスとは？
+### メトリクスとは？
 システムの状態やパフォーマンスを「数値」で集計したものです。
 
 従来のインフラ監視でもお馴染みのCPU使用率やメモリ使用量、リクエスト数などを時系列で記録し、システム全体の傾向や健全性を把握します。
@@ -126,7 +76,7 @@ https://www.oreilly.co.jp/books/9784814401024/
 | 種類 | 説明 | 例 |
 |------|------|-----|
 | **Counter** | 増加のみする累積値 | リクエスト数、エラー数 |
-| **Gauge** | 上下する現在値 | CPU使用率、メモリ使用量 |
+| **Gauge** | 上下する瞬間値 | CPU使用率、メモリ使用量 |
 | **Histogram** | 値の分布 | レイテンシ（p50, p95, p99） |
 
 #### トレースとの使い分け
@@ -136,31 +86,7 @@ https://www.oreilly.co.jp/books/9784814401024/
 | 用途 | 原因調査・ボトルネック特定 | 傾向把握・アラート |
 | 問い | 「なぜ遅い？」 | 「今、異常か？」 |
 
-### 6-3. ログとは？
-システムで発生したイベントを記録したものです。
-
-従来のログは独立したテキストファイルでしたが、OpenTelemetryでは**Trace IDを埋め込む**ことで、トレースやメトリクスと紐付けられます。
-
-#### 従来のログとの違い
-| 観点 | 従来 | OTel |
-|------|-----------|-----------|
-| 構造 | テキストの羅列 | 構造化データ |
-| 関連付け | 時刻で手動突き合わせ | Trace IDで自動紐付け |
-| 調査方法 | grep頼み | トレースからドリルダウン |
-
-#### 主な用途
-- トレースできないレガシーシステムの観測
-- インフラ（DB、ロードバランサー）のイベント記録
-- リクエストに紐付かない処理（起動/停止、cronジョブ）の記録
-
-#### 実装のポイント
-既存のロギングライブラリ（Log4j, Logbackなど）にOTelの出力プラグイン（アペンダー）を差し込むだけでOK。
-
-:::note info
-今回の実装ではログは対象外としていますが、OTelの3本柱（トレース・メトリクス・ログ）として押さえておくと良いです。
-:::
-
-### 6-4. 収集したテレメトリデータの流れ
+### 収集したテレメトリデータの流れ
 
 #### アプリケーション側（API / SDK）
 - `API`: 「何を計測するか」を定義するインターフェース
@@ -197,39 +123,21 @@ flowchart TB
     C3 --> B3
 ```
 
-### 6-5. サンプリングとは？
-テレメトリデータ（特にトレース）の量を制御する仕組みです。
-すべてのリクエストを記録するとデータ量が膨大になり、ストレージコストやネットワーク帯域を圧迫することを回避できます。
-
-#### 2つのアプローチ
-
-| 方式 | タイミング | 特徴 |
-|------|-----------|------|
-| **Head-based** | トレース開始時に決定 | 低コスト、SDK内で完結 |
-| **Tail-based** | トレース完了後に決定 | エラーや遅延を確実に残せる |
-
-#### ベストプラクティス
-1. まずは**サンプリングなし（100%取得）**で開始
-2. コストが問題になったら、不要データ（ヘルスチェック等）を**フィルタリング**
-3. それでも足りなければ**Head-based** → **Tail-based**と段階的に導入
-
-## 7. 実装
-上記を踏まえて、EKS上にPodとしてCollectorをサイドカーとしてデプロイし、最終的にはApplication SignalsのAPM上にトレースとメトリクスのデータを可視化しました。
-Otel SDKでPushする構成にしています。
+## 6. 実装
+上記を踏まえて、研修ではEKS上にPodとしてCollectorをサイドカーとしてデプロイし、最終的にはApplication SignalsのAPM上にトレースとメトリクスのデータを可視化しました。
 - OpenTelemetry SDK
 - AWS Distro for OpenTelemetry Collector
 
 ### SDKの実装
 - GoのSDKを用いて実装します。Middlewareとして全エンドポイントのトレース、メトリクスを収集します。
-- トレース周りはGin用のパッケージがあるのでそちらを利用していて、メトリクスは非対応のため自分で実装しています。
-- ログ、サンプリング、 Resourceなどは本番では必要になるかと思いますが、今回は実装していません。
+- トレース周りはGin用のパッケージがあるのでそちらを利用していて、メトリクスは日滞納のため自分で実装しています。
 ```go: app/middleware/otel.go
 package middleware
 
 import (
 	"context"
-  "errors"
 	"time"
+	"errors"
 
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
@@ -324,9 +232,6 @@ func (m *OtelMetricsMiddleware) OtelMetrics() gin.HandlerFunc {
 			attribute.Int("status", status),
 		}
 
-    // Counterのみ定義している。
-    // setup側でrequestDuration（Histogram）は定義しているが、
-    // レイテンシはトレース（Span）で確認できるため、今回は実装していない
 		m.requestCounter.Add(c.Request.Context(), 1, metric.WithAttributes(attrs...))
 	}
 }
@@ -386,7 +291,7 @@ func main() {
 
   // トレースはotelginのライブラリに任せている
 	router.Use(otelgin.Middleware("go-app"))
-  // メトリクスはミドルウェアで実装している
+  // メトリクスはミドルウェアでじそっそうしている
 	router.Use(otelMiddleware.OtelMetrics())
 
   // 別ファイルでhandlerの処理は記載しているが、今回は省略。
@@ -412,29 +317,5 @@ func main() {
 
 ```
 
-## 8. 収集したテレメトリーデータの可視化
-インフラの設定は記述していませんが、最終的なイメージとして以下のようなアプリケーション内部でのレイテンシ等のパフォーマンスの可視化が可能になります。
-
-## 9. 参考
-
-https://opentelemetry.io/community/mission/
-
-https://opentelemetry.io/ja/docs/concepts/observability-primer/
-
-https://opentelemetry.io/ja/docs/concepts/signals/traces/
-
-https://opentelemetry.io/docs/concepts/signals/metrics/
-
-https://opentelemetry.io/docs/concepts/signals/logs/
-
-https://blog.cybozu.io/entry/2023/04/12/170000
-
-https://zenn.dev/hkdord/articles/opentelemetry-sdk-deep-dive
-
-https://zenn.dev/ryoyoshii/books/opentelemetry-firststep/viewer/collector
-
-https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/github.com/gin-gonic/gin/otelgin
-
-https://www.oreilly.co.jp/books/9784814401031/
-
-https://www.oreilly.co.jp/books/9784814401024/
+この説明、実装で技術的な誤りや改善点、読みづらい箇所はありますか？
+あるなら修正したいので教えて欲しいです。
