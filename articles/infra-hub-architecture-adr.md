@@ -6,9 +6,12 @@ topics: ["AWS", "nextjs", "SRE", "Lambda", "PlatformEngineering"]
 published: false
 ---
 
+初めまして！
+TRIPLE THREE に主に SRE として業務委託で参画している takehiro1111 です！
+
 ## この記事で書くこと
 
-社内(副業先)向けに作った`Infra-Hub`というアプリケーションの設計判断を、備忘録も含め記述します。
+社内向けに作った`Infra-Hub`というアプリケーションの設計判断を、備忘録も含め記述します。
 
 - なぜ作ることになったか
 - AWS の全体構成と判断したこと
