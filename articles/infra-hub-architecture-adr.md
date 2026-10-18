@@ -101,6 +101,9 @@ Lambda は実行時間だけの課金で、待機中は 0 になります。
 ### Lambda Web Adapter で Next.js をそのまま動かす
 
 Lambda 向けにアプリを書き換えたくなかったので、Lambda Web Adapter（LWA）を使っています。
+LWA の実態は Go で書かれた 1 つの実行ファイルです。
+Lambda 拡張として起動し、Lambda Runtime API から受け取ったイベントを HTTP リクエストに変換してコンテナ内の `PORT` で待つ Web サーバへ転送し、返ってきた HTTP レスポンスを Lambda のレスポンス形式に戻します。
+つまり Lambda のイベント形式と普通の HTTP の間を往復変換するプロキシです。
 コンテナイメージに LWA を拡張として同梱すると、Function URL のリクエストを HTTP として `PORT` に橋渡ししてくれるので、Next.js の standalone サーバをそのまま起動できます。
 
 ```dockerfile
