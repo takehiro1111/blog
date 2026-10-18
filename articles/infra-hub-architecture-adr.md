@@ -6,7 +6,8 @@ topics: ["AWS", "nextjs", "SRE", "Lambda", "PlatformEngineering"]
 published: false
 ---
 
-初めまして、TRIPLE THREEで主にSREの仕事をしているtakehiro1111です！
+初めまして！
+TRIPLE THREEで主にSREの仕事をしているtakehiro1111です！
 
 ## この記事で書くこと
 
