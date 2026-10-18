@@ -7,7 +7,7 @@ published: false
 ---
 
 初めまして！
-TRIPLE THREEで主にSREの仕事をしているtakehiro1111です！
+TRIPLE THREEで業務委託として主にSREの仕事をしているtakehiro1111です！
 
 ## この記事で書くこと
 
