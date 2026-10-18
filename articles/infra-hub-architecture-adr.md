@@ -115,7 +115,8 @@ CMD ["node", "server.js"]
 Lambda Web Adapter は `/opt/extensions/` に置いた Lambda 拡張（Lambda Extension）として動きます。
 Lambda の実行環境は起動時に `/opt/extensions/` 配下のファイルを拡張として起動し、Function URL から来たリクエストを HTTP に変換して `PORT` の Next.js へ渡します。
 この仕組みは Lambda の実行環境にしかないため、同じイメージをローカルで `docker run` すると `/opt/extensions/lambda-adapter` はただのファイルとして置かれたままになり、`CMD` の `node server.js` だけが動いて Next.js が 8080 番で直接リクエストを受けます。
-本番とローカルで同じイメージを使えます。
+どちらでも Next.js 側は「8080 番で HTTP を受ける」だけで、Lambda 専用のハンドラやエントリポイントをコードに持っていません。
+Lambda 向けの差分が拡張ファイル 1 つに閉じているため、Lambda 用に Dockerfile を分けたりハンドラを書いたりせず、普通の Web アプリと同じ Dockerfile のままで Lambda でもローカルでも動きます。
 
 ### CloudFront 経由であることの検証: `x-origin-verify` ヘッダ
 
@@ -124,11 +125,21 @@ Lambda の実行環境は起動時に `/opt/extensions/` 配下のファイル�
 Function URL の認可は `NONE` です。
 代わりに CloudFront が origin へのリクエストに共有シークレットのヘッダ（`x-origin-verify`）を付け、アプリ側の `proxy.ts`（Next.js 16から`middleware` から改称された規約）が全パスで検証し、一致しなければ 403 を返します。
 
+検証の流れは次のとおりです。
+
+1. 共有シークレットの値は Terraform が生成し、CloudFront の origin のカスタムヘッダと Secrets Manager の両方に同じ値を入れる
+2. Lambda には Secrets Manager のシークレット名だけを環境変数で渡す
+3. アプリは最初のリクエストで Secrets Manager から値を取得し、プロセスが生きている間はメモリに保持する
+4. 以降は全リクエストで、届いた `x-origin-verify` ヘッダの値とメモリ上の値を比較し、一致しなければ 403 を返す
+
+Secrets Manager への問い合わせはリクエストごとには発生しません。
+
 Function URL を `AWS_IAM` にして CloudFront の OAC（Origin Access Control）で保護する案も検討しました。
-CloudFront が origin へのリクエストに AWS の署名を付け、CloudFront からの呼び出しだけを Lambda が受け付ける方式です。
-ただし起動・停止のような POST では、ブラウザ側がリクエスト本文の SHA256 を `x-amz-content-sha256` ヘッダに付けないと Lambda に拒否されます。
-画面の `fetch` にその処理を足す必要があり、手間に見合わないため、CloudFront が付ける共有シークレットヘッダをアプリで検証する方式にしました。
-シークレットは Secret Managerで管理しています。
+CloudFront が origin へのリクエストに AWS の署名を付け、署名の無い直アクセスは Lambda が拒否する方式です。
+ただし、この方式で POST を通すには、ブラウザが毎回リクエスト本文のハッシュを計算して `x-amz-content-sha256` ヘッダに入れる必要があります。
+CloudFront はこのヘッダを作ってくれないため、画面の `fetch` に計算処理を足すことになります。
+IAM 署名で守る案はブラウザ側に余計な実装が要るので、代わりに CloudFront が origin へ付ける固定の共有シークレットヘッダ（`x-origin-verify`）をアプリで照合する方式にしました。
+シークレットの値は Secrets Manager に置き、アプリが起動時に取得します。
 
 ## 判断2. 認証は Auth.js + Google OIDC
 
