@@ -41,7 +41,7 @@ AWSだと、EventBridge Scheduler の定時起動停止で簡単に実現でき�
 1. 実行基盤の選定
 ```md
 - Lambda（コンテナイメージ + Lambda Web Adapter）+ Function URL + CloudFrontにし、常時稼働するコンピュートやネットワークリソースに依存しない
-  - 本記事を公開する前にLambda Web FunctionsがGAされたため、新しく作る場合はLambda Web Adapter無しでデプロイできるかと思います。
+  - 本記事を公開する前にLambda Web FunctionsがGAされたため、新しく作る場合はLambda Web Adapterを意識する必要性はないです。
   - Function URL は認可 NONE にし、CloudFront が origin へ付与する `x-origin-verify` ヘッダをアプリ側（proxy.ts）で検証する。CloudFront を通らない直アクセスは 403 で弾く。
 ```
 
