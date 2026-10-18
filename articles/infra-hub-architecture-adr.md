@@ -2,7 +2,7 @@
 title: "社内向けアプリケーションを個人開発してリリースした話"
 emoji: "🛠️"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["AWS", "nextjs", "SRE", "Lambda", "authjs"]
+topics: ["AWS", "nextjs", "SRE", "Lambda", "PlatformEngineering"]
 published: false
 ---
 
@@ -101,6 +101,9 @@ Lambda は実行時間だけの課金で、待機中は 0 になります。
 ### Lambda Web Adapter で Next.js をそのまま動かす
 
 Lambda 向けにアプリを書き換えたくなかったので、Lambda Web Adapter（LWA）を使っています。
+LWA の実態は Go で書かれた 1 つの実行ファイルです。
+Lambda 拡張として起動し、Lambda Runtime API から受け取ったイベントを HTTP リクエストに変換してコンテナ内の `PORT` で待つ Web サーバへ転送し、返ってきた HTTP レスポンスを Lambda のレスポンス形式に戻します。
+つまり Lambda のイベント形式と普通の HTTP の間を往復変換するプロキシです。
 コンテナイメージに LWA を拡張として同梱すると、Function URL のリクエストを HTTP として `PORT` に橋渡ししてくれるので、Next.js の standalone サーバをそのまま起動できます。
 
 ```dockerfile
@@ -211,6 +214,10 @@ statement {
 
 タグを付けるのは TEST 環境のリソースだけなので、本番リソースはそもそも操作できません。
 「UI 側で本番を除外する」ではなく「IAM で変更できない」にしています。
+
+変更系のほかに `cloudformation:GetTemplate` も許可しています。
+プロダクト側のインフラは CDK で管理されているため、ECS サービスを起動する時のタスク数は CDK が生成した CloudFormation スタックのテンプレートから宣言値を読み、停止で 0 にした desiredCount をその値に戻します。
+こちらも同じタグの付いたスタックだけに限定しています。
 
 ## 判断4. DB を持たない
 
