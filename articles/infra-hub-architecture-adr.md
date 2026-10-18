@@ -91,7 +91,7 @@ Lambda は実行時間だけの課金で、待機中は 0 になります。
 |---|---|
 | ECS Fargate + ALB | 常時課金と ALB 固定費。利用頻度に見合わない |
 | App Runner | 最小インスタンスの常時課金が残る |
-| Function URL を OAC（AWS_IAM）で保護 | ブラウザからのボディ付き POST を素で扱えない。共有シークレットヘッダで代替 |
+| Function URL を OAC（AWS_IAM）で保護 | POST のたびにブラウザ側で本文のハッシュをヘッダに付ける必要がある。代わりに CloudFront が付ける `x-origin-verify` ヘッダをアプリで検証する |
 
 ### Lambda Web Adapter で Next.js をそのまま動かす
 
