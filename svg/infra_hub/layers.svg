@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300">
+  <defs>
+    <marker id="arb" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+    <style>
+      text{font-family:'Hiragino Sans','Noto Sans JP','Helvetica Neue',Arial,sans-serif;fill:#0f172a;font-size:14px}
+      .h{font-size:20px;font-weight:700}
+      .s{font-size:11.5px;fill:#475569}
+      .b{font-weight:700}
+      .box{fill:#fff;stroke:#334155;stroke-width:1.5}
+      .lb{stroke:#2563eb;stroke-width:2;fill:none;marker-end:url(#arb)}
+      .note{fill:#fffbeb;stroke:#f59e0b;stroke-width:1.5}
+    </style>
+  </defs>
+  <rect width="1200" height="300" fill="#f8fafc"/>
+  <text x="30" y="40" class="h">アプリの内側は 3 段だけ</text>
+
+  <rect x="30" y="80" width="160" height="90" rx="8" class="box"/>
+  <text x="110" y="110" text-anchor="middle" class="b">画面</text>
+  <text x="110" y="130" text-anchor="middle" class="s">app/(app)/resources</text>
+  <text x="110" y="148" text-anchor="middle" class="s">SWR で API を呼ぶ</text>
+
+  <rect x="240" y="80" width="215" height="90" rx="8" class="box" stroke="#2563eb" stroke-width="2"/>
+  <text x="347" y="110" text-anchor="middle" class="b">1. 入口</text>
+  <text x="347" y="130" text-anchor="middle" class="s">app/api/{ec2,rds,ecs,products}</text>
+  <text x="347" y="148" text-anchor="middle" class="s">Route Handler。入力検証と認可</text>
+  <path d="M190,125 L236,125" class="lb"/>
+
+  <rect x="500" y="80" width="245" height="90" rx="8" class="box" stroke="#2563eb" stroke-width="2"/>
+  <text x="622" y="110" text-anchor="middle" class="b">2. 操作の組み立て</text>
+  <text x="622" y="130" text-anchor="middle" class="s">src/features/&lt;機能&gt;（例: start-stop）</text>
+  <text x="622" y="148" text-anchor="middle" class="s">一括操作の段階実行、部分失敗の扱い</text>
+  <path d="M455,125 L496,125" class="lb"/>
+
+  <rect x="790" y="80" width="215" height="90" rx="8" class="box" stroke="#2563eb" stroke-width="2"/>
+  <text x="897" y="110" text-anchor="middle" class="b">3. AWS SDK の薄いラッパー</text>
+  <text x="897" y="130" text-anchor="middle" class="s">src/lib/aws-client</text>
+  <text x="897" y="148" text-anchor="middle" class="s">AssumeRole 済みクライアントで呼ぶ</text>
+  <path d="M745,125 L786,125" class="lb"/>
+
+  <rect x="1050" y="80" width="120" height="90" rx="8" class="box" stroke-dasharray="4 3"/>
+  <text x="1110" y="110" text-anchor="middle" class="b">AWS API</text>
+  <text x="1110" y="130" text-anchor="middle" class="s">リソースの状態は</text>
+  <text x="1110" y="148" text-anchor="middle" class="s">ここが正</text>
+  <path d="M1005,125 L1046,125" class="lb"/>
+
+  <rect x="30" y="210" width="1140" height="60" rx="8" class="note"/>
+  <text x="48" y="236" class="s" fill="#92400e">リポジトリ層・DTO・ユースケース層は置かない。アプリ側に守るべき不変条件（永続モデル）が無く、翻訳の層を足すと読む量だけが増えるため。</text>
+  <text x="48" y="256" class="s" fill="#92400e">機能単位（src/features/&lt;機能&gt;）でまとめると、AI エージェントがコード全体を一度に読んで変更しやすい。</text>
+</svg>
