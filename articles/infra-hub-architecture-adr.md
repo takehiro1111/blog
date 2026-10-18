@@ -99,6 +99,7 @@ Lambda は実行時間だけの課金で、待機中は 0 になります。
 |---|---|
 | ECS Fargate + ALB | 常時課金と ALB 固定費。利用頻度に見合わない |
 | App Runner | 最小インスタンスの常時課金が残る |
+| API Gateway + Lambda | リクエスト単位の課金が別に発生する。Function URL なら Lambda 以外の課金が無いため、少しでも課金要素を減らしたかった |
 | Function URL を OAC（AWS_IAM）で保護 | POST のたびにブラウザ側で本文のハッシュをヘッダに付ける必要がある。代わりに CloudFront が付ける `x-origin-verify` ヘッダをアプリで検証する |
 
 ### Lambda Web Adapter で Next.js をそのまま動かす
