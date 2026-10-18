@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+  <defs>
+    <marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker>
+    <marker id="arb" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+    <marker id="arg" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+    <marker id="arp" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker>
+    <style>
+      text{font-family:'Hiragino Sans','Noto Sans JP','Helvetica Neue',Arial,sans-serif;fill:#0f172a;font-size:14px}
+      .h{font-size:20px;font-weight:700}
+      .s{font-size:12px;fill:#475569}
+      .b{font-weight:700}
+      .box{fill:#fff;stroke:#334155;stroke-width:1.5}
+      .gate{fill:#eff6ff;stroke:#2563eb;stroke-width:2}
+      .deny{fill:#fef2f2;stroke:#dc2626;stroke-width:1.5}
+      .ok{fill:#f0fdf4;stroke:#16a34a;stroke-width:1.5}
+      .lb{stroke:#2563eb;stroke-width:2;fill:none;marker-end:url(#arb)}
+      .lr{stroke:#dc2626;stroke-width:1.5;fill:none;marker-end:url(#arr)}
+      .lg{stroke:#16a34a;stroke-width:1.5;fill:none;marker-end:url(#arg)}
+      .lp{stroke:#7c3aed;stroke-width:1.5;fill:none;marker-end:url(#arp);stroke-dasharray:5 4}
+      .ln{stroke:#334155;stroke-width:1.5;fill:none;marker-end:url(#ar)}
+      .note{fill:#fffbeb;stroke:#f59e0b;stroke-width:1.5}
+    </style>
+  </defs>
+  <rect width="1200" height="620" fill="#f8fafc"/>
+  <text x="30" y="40" class="h">1 リクエストが通る関門（CloudFront 経由か → サインイン済みか → 操作権限）</text>
+
+  <!-- Browser -->
+  <rect x="30" y="120" width="120" height="90" rx="8" class="box"/>
+  <text x="90" y="160" text-anchor="middle" class="b">ブラウザ</text>
+  <text x="90" y="180" text-anchor="middle" class="s">開発者</text>
+
+  <!-- CloudFront -->
+  <rect x="190" y="120" width="160" height="90" rx="8" class="box"/>
+  <text x="270" y="146" text-anchor="middle" class="b">① CloudFront</text>
+  <text x="270" y="168" text-anchor="middle" class="s">独自ドメイン / HTTPS</text>
+  <text x="270" y="186" text-anchor="middle" class="s">origin へ x-origin-verify</text>
+  <text x="270" y="202" text-anchor="middle" class="s">ヘッダを付与</text>
+  <path d="M150,165 L186,165" class="lb"/>
+
+  <!-- Gate 1 -->
+  <rect x="390" y="120" width="190" height="90" rx="8" class="gate"/>
+  <text x="485" y="146" text-anchor="middle" class="b">② リクエスト経路の検証</text>
+  <text x="485" y="168" text-anchor="middle" class="s">proxy.ts（全パス）</text>
+  <text x="485" y="186" text-anchor="middle" class="s">x-origin-verify が</text>
+  <text x="485" y="202" text-anchor="middle" class="s">共有シークレットと一致するか</text>
+  <path d="M350,165 L386,165" class="lb"/>
+
+  <!-- Gate 2 -->
+  <rect x="620" y="120" width="190" height="90" rx="8" class="gate"/>
+  <text x="715" y="146" text-anchor="middle" class="b">③ セッションの検証</text>
+  <text x="715" y="168" text-anchor="middle" class="s">Auth.js（proxy.ts 内）</text>
+  <text x="715" y="186" text-anchor="middle" class="s">JWT セッション（12 時間）</text>
+  <text x="715" y="202" text-anchor="middle" class="s">があるか</text>
+  <path d="M580,165 L616,165" class="lb"/>
+
+  <!-- Route handler -->
+  <rect x="850" y="120" width="150" height="90" rx="8" class="box"/>
+  <text x="925" y="146" text-anchor="middle" class="b">④ Route Handler</text>
+  <text x="925" y="168" text-anchor="middle" class="s">app/api/ec2・rds・ecs</text>
+  <text x="925" y="186" text-anchor="middle" class="s">対象外アカウントへの</text>
+  <text x="925" y="202" text-anchor="middle" class="s">要求は拒否</text>
+  <path d="M810,165 L846,165" class="lb"/>
+
+  <!-- Spoke -->
+  <rect x="1040" y="120" width="130" height="90" rx="8" class="gate"/>
+  <text x="1105" y="146" text-anchor="middle" class="b">⑤ 権限</text>
+  <text x="1105" y="168" text-anchor="middle" class="s">AssumeRole →</text>
+  <text x="1105" y="186" text-anchor="middle" class="s">AWS API。変更系は</text>
+  <text x="1105" y="202" text-anchor="middle" class="s">タグ条件で限定</text>
+  <path d="M1000,165 L1036,165" class="lb"/>
+
+  <!-- Deny 1 -->
+  <path d="M485,210 L485,266" class="lr"/>
+  <rect x="390" y="270" width="190" height="60" rx="8" class="deny"/>
+  <text x="485" y="294" text-anchor="middle" class="b" fill="#991b1b">403 Forbidden</text>
+  <text x="485" y="314" text-anchor="middle" class="s">Function URL への直アクセス</text>
+
+  <!-- Deny 2 -->
+  <path d="M715,210 L715,266" class="lr"/>
+  <rect x="600" y="270" width="230" height="76" rx="8" class="deny"/>
+  <text x="715" y="292" text-anchor="middle" class="b" fill="#991b1b">画面: /signin へ / API: 401</text>
+  <text x="715" y="312" text-anchor="middle" class="s">API は JSON で返す</text>
+  <text x="715" y="330" text-anchor="middle" class="s">サインイン後は元の画面へ戻す</text>
+
+  <!-- Audit -->
+  <path d="M925,210 L925,266" class="ln"/>
+  <rect x="850" y="270" width="150" height="60" rx="8" class="box"/>
+  <text x="925" y="294" text-anchor="middle" class="b">監査ログ</text>
+  <text x="925" y="314" text-anchor="middle" class="s">CloudWatch Logs</text>
+
+  <!-- Sign-in flow -->
+  <rect x="390" y="380" width="780" height="150" rx="12" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="7 5"/>
+  <text x="406" y="404" class="b" fill="#6d28d9">サインインの流れ（③ で弾かれた時だけ）</text>
+
+  <rect x="410" y="430" width="200" height="80" rx="8" class="box" stroke="#7c3aed"/>
+  <text x="510" y="456" text-anchor="middle" class="b">Google OIDC</text>
+  <text x="510" y="476" text-anchor="middle" class="s">hd パラメータで Workspace の</text>
+  <text x="510" y="492" text-anchor="middle" class="s">アカウントを優先表示</text>
+
+  <rect x="660" y="430" width="230" height="80" rx="8" class="box" stroke="#7c3aed"/>
+  <text x="775" y="456" text-anchor="middle" class="b">アプリ側でも検証</text>
+  <text x="775" y="476" text-anchor="middle" class="s">hd が許可ドメインと一致 かつ</text>
+  <text x="775" y="492" text-anchor="middle" class="s">email_verified が true</text>
+  <path d="M610,470 L656,470" class="lp"/>
+
+  <rect x="940" y="430" width="210" height="36" rx="8" class="ok"/>
+  <text x="1045" y="454" text-anchor="middle" class="s" fill="#166534">JWT を発行し ③ へ戻る</text>
+  <path d="M890,455 L936,450" class="lg"/>
+
+  <rect x="940" y="474" width="210" height="36" rx="8" class="deny"/>
+  <text x="1045" y="498" text-anchor="middle" class="s" fill="#991b1b">拒否: /signin?error へ</text>
+  <path d="M890,485 L936,492" class="lr"/>
+
+  <!-- note -->
+  <rect x="30" y="560" width="1140" height="40" rx="8" class="note"/>
+  <text x="48" y="586" class="s" fill="#92400e">AWS リソースを止められる操作のため、Google 側の設定（hd パラメータ）に頼らず、アプリ側のコールバックでもドメインと検証済みメールを確認する。</text>
+</svg>
