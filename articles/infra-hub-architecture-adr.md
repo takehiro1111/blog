@@ -2,7 +2,7 @@
 title: "社内向けアプリケーションを個人開発してリリースした話"
 emoji: "🛠️"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["AWS", "Next.js", "SRE", "Lambda", "Auth.js"]
+topics: ["AWS", "nextjs", "SRE", "Lambda", "authjs"]
 published: false
 ---
 
