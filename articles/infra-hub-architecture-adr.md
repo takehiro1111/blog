@@ -1,5 +1,5 @@
 ---
-title: "社内向けアプリケーションを個人開発しました"
+title: "社内向けアプリケーションを個人開発してリリースしました"
 emoji: "🛠️"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS", "nextjs", "Terraform", "Lambda", "ADR"]
