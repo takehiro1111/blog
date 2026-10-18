@@ -1,5 +1,5 @@
 ---
-title: "社内向けに開発したアプリケーションの設計判断を ADR から公開する（Lambda × Next.js、DB なし）"
+title: "社内向けアプリケーションを個人開発しました"
 emoji: "🛠️"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS", "nextjs", "Terraform", "Lambda", "ADR"]
