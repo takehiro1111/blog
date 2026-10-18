@@ -125,6 +125,13 @@ Lambda 向けの差分が拡張ファイル 1 つに閉じているため、Lamb
 Function URL の認可は `NONE` です。
 代わりに CloudFront が origin へのリクエストに共有シークレットのヘッダ（`x-origin-verify`）を付け、アプリ側の `proxy.ts`（Next.js 16から`middleware` から改称された規約）が全パスで検証し、一致しなければ 403 を返します。
 
+Function URL を `AWS_IAM` にして CloudFront の OAC（Origin Access Control）で保護する案も検討しました。
+CloudFront が origin へのリクエストに AWS の署名を付け、署名の無い直アクセスは Lambda が拒否する方式です。
+ただし、この方式で POST を通すには、ブラウザが毎回リクエスト本文のハッシュを計算して `x-amz-content-sha256` ヘッダに入れる必要があります。
+CloudFront はこのヘッダを作ってくれないため、画面の `fetch` に計算処理を足すことになります。
+IAM 署名で守る案はブラウザ側に余計な実装が要るので、代わりに CloudFront が origin へ付ける固定の共有シークレットヘッダ（`x-origin-verify`）をアプリで照合する方式にしました。
+シークレットの値は Secrets Manager に置き、アプリが起動時に取得します。
+
 検証の流れは次のとおりです。
 
 1. 共有シークレットの値は Terraform が生成し、CloudFront の origin のカスタムヘッダと Secrets Manager の両方に同じ値を入れる
@@ -133,13 +140,6 @@ Function URL の認可は `NONE` です。
 4. 以降は全リクエストで、届いた `x-origin-verify` ヘッダの値とメモリ上の値を比較し、一致しなければ 403 を返す
 
 Secrets Manager への問い合わせはリクエストごとには発生しません。
-
-Function URL を `AWS_IAM` にして CloudFront の OAC（Origin Access Control）で保護する案も検討しました。
-CloudFront が origin へのリクエストに AWS の署名を付け、署名の無い直アクセスは Lambda が拒否する方式です。
-ただし、この方式で POST を通すには、ブラウザが毎回リクエスト本文のハッシュを計算して `x-amz-content-sha256` ヘッダに入れる必要があります。
-CloudFront はこのヘッダを作ってくれないため、画面の `fetch` に計算処理を足すことになります。
-IAM 署名で守る案はブラウザ側に余計な実装が要るので、代わりに CloudFront が origin へ付ける固定の共有シークレットヘッダ（`x-origin-verify`）をアプリで照合する方式にしました。
-シークレットの値は Secrets Manager に置き、アプリが起動時に取得します。
 
 ## 判断2. 認証は Auth.js + Google OIDC
 
