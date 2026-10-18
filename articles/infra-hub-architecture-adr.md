@@ -7,7 +7,7 @@ published: false
 ---
 
 初めまして！
-TRIPLE THREEで主にSREの取り組みをしているtakehiro1111です！
+TRIPLE THREEで主にSRE周りの取り組みをしているtakehiro1111です！
 
 ## この記事で書くこと
 
