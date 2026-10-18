@@ -1,8 +1,8 @@
 ---
-title: "社内向けアプリケーションを個人開発してリリースしました"
+title: "社内向けアプリケーションを個人開発してリリースした"
 emoji: "🛠️"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["AWS", "Next.js", "Terraform", "Lambda", "Auth.js"]
+topics: ["AWS", "Next.js", "SRE", "Lambda", "Auth.js"]
 published: false
 ---
 
@@ -11,11 +11,14 @@ published: false
 社内(副業先)向けに作った`Infra-Hub`というアプリケーションの設計判断を、備忘録も含め記述します。
 
 - なぜ作ることになったか
-- AWS の全体構成と、Lambda を選んで DB を持たなかった理由
-- Next.js の単一アプリにした理由
-- 認証・認可を 3 つの関門に分けた考え方
-- マルチアカウントと Terraform CI の認証経路
-- 受け入れたリスクと、構成を見直す条件
+- AWS の全体構成と判断したこと
+  - 実行基盤に Lambda + Function URL + CloudFront を選んだ理由
+  - 認証を Auth.js + Google OIDC にした理由
+  - 認可を IAM ロールとハブ & スポークで行う理由
+  - DB を持たない理由
+  - Next.js の単一アプリにし、FE と BE を分けない理由
+- 許容したリスクと監視
+- 構成を見直す条件
 - 今後の展望
 
 ## なぜ作ることになったか
