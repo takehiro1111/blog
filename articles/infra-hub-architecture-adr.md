@@ -112,7 +112,10 @@ USER node
 CMD ["node", "server.js"]
 ```
 
-ローカルで `docker run` したときは拡張が起動せず、`server.js` が直接 8080 で待ち受けます。
+Lambda Web Adapter は `/opt/extensions/` に置いた Lambda 拡張（Lambda Extension）として動きます。
+Lambda の実行環境は起動時に `/opt/extensions/` 配下のファイルを拡張として起動し、Function URL から来たリクエストを HTTP に変換して `PORT` の Next.js へ渡します。
+この仕組みは Lambda の実行環境にしかないため、同じイメージをローカルで `docker run` すると `/opt/extensions/lambda-adapter` はただのファイルとして置かれたままになり、`CMD` の `node server.js` だけが動いて Next.js が 8080 番で直接リクエストを受けます。
+本番とローカルで同じイメージを使えます。
 
 ### CloudFront 経由であることの検証: `x-origin-verify` ヘッダ
 
