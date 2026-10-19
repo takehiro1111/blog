@@ -339,7 +339,7 @@ Infra-Hub の入口にしている別の社内アプリが tt-hub です！
 
 @[card](https://note.com/triplethree_page/n/n0460ff17cef4)
 
-### We are hiring
+## We're Hiring!
 
 TRIPLE THREE では、少人数 × AI 前提で開発も業務も回す仲間を募集しています！
 カジュアル面談もやっているので、話だけでも聞いてみたい！という方も大歓迎です。
