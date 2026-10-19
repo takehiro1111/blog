@@ -183,7 +183,7 @@ export const isAllowedProfile = (profile, allowedDomain) =>
 ```
 
 当初は Cognito User Pool + Google Workspace（外部 IdP）の SAMLで、認証をインフラにオフロードする方向でした。
-Workspace 側の設定が面倒なことに加え、社内の別 Web アプリでも同様にOIDCで認証していたため、そちらと合わせる方向で合意しました。
+Workspace 側の設定が面倒なことに加え、別の社内 Web アプリでも同様にOIDCで認証していたため、そちらと合わせる方向で合意しました。
 
 ## 判断3. 認可は IAM ロールとハブ & スポーク
 
