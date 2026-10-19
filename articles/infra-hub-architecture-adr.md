@@ -38,6 +38,8 @@ AWSだと、EventBridge Scheduler の定時起動停止で簡単に実現でき�
 
 それがきっかけでUIから起動停止できたら良いのではと考え、命名は今後他のインフラや開発周辺のPlatformに関するトイルも解消できるようなアプリケーションにしたいと思いInfra-Hubと名付けて開発するに至りました。
 
+現時点での構想はコスト削減や売上に直接的に寄与しない効率化が目的のため、設計の最優先事項はコストをかけないと最初に定義しました。
+
 ## 全体構成
 
 ![infra-hub の AWS 構成](/images/infra_hub/architecture.png)
@@ -50,12 +52,13 @@ AWSだと、EventBridge Scheduler の定時起動停止で簡単に実現でき�
 ```md
 - Lambda（コンテナイメージ + Lambda Web Adapter）+ Function URL + CloudFrontにし、常時稼働するコンピュートやネットワークリソースに依存しない
   - 本記事を公開する前にLambda Web FunctionsがGAされたため、新しく作る場合はLambda Web Adapterを意識する必要性はないです。
-  - Function URL は認可 NONE にし、CloudFront が origin へ付与する `x-origin-verify` ヘッダをアプリ側（proxy.ts）で検証する。CloudFront を通らない直アクセスは 403 で弾く。
+  - Function URL は認可 NONE にし、CloudFront が origin へ付与する `x-origin-verify` ヘッダをアプリ側（proxy.ts）で検証する。
+  - CloudFront を通らない直アクセスは 403 で弾く。
 ```
 
 2. 認証
 ```md
-- Auth.js + Google OIDCでアプリで直接受ける。
+- Auth.js + Google OIDCでアプリ側で直接受ける。
   - 許可した Workspace ドメインかつメール検証済みのアカウントだけサインインでき、セッションは JWT（12 時間）
   - Cognito + Google Workspace（外部 IdP）の SAML 認証で認証をインフラにオフロードする方向も検討したが、
     Workspace側の設定が面倒なため、他の社内Webアプリで運用中のOIDCの方が良いとCTOと合意した。
@@ -182,7 +185,7 @@ export const isAllowedProfile = (profile, allowedDomain) =>
 ```
 
 当初は Cognito User Pool + Google Workspace（外部 IdP）の SAMLで、認証をインフラにオフロードする方向でした。
-Workspace 側の設定が面倒なことに加え、社内の別 Web アプリでも同様にOIDCで認証していたため、そちらと合わせる方向で合意しました。
+Workspace 側の設定が面倒なことに加え、別の社内 Web アプリでも同様にOIDCで認証していたため、そちらと合わせる方向で合意しました。
 
 ## 判断3. 認可は IAM ロールとハブ & スポーク
 
@@ -291,7 +294,7 @@ export const phaseOrder: Record<ResourceAction, readonly ResourceKind[]> = {
 
 ## 許容したリスク
 
-DB を持たず Lambda で動かす以上、いくつかの制約は受け入れています。
+DBを持たないことやLambdaで動かす以上、いくつかの制約は受け入れています。
 
 | 制約 | 内容 | 対応 |
 |---|---|---|
@@ -304,7 +307,7 @@ DB を持たず Lambda で動かす以上、いくつかの制約は受け入れ
 
 
 ## 監視
-基盤の監視はCloudWatch Alarms を 4 つ置き、EventBridge → SNS → Slack に通知しています。
+基盤の監視はCloudWatch Alarms を 4 つ置き、EventBridge → SNS → Chatbot → Slack に通知しています。
 
 | アラーム | 条件 | 意味 |
 |---|---|---|
@@ -321,7 +324,7 @@ DB を持たず Lambda で動かす以上、いくつかの制約は受け入れ
 | アプリ固有の状態を持つ | 利用者ごとの権限、操作の予約や承認フロー、設定の保存 | DB の追加を検討 |
 | ドメインが厚くなる | 複数リソースにまたがる不変条件、業務ルールの分岐 | 層の追加や責務の分割を検討 |
 | 1 リクエストで長時間の処理 | 55 秒を超える処理 | Step Functions や SQS などの非同期実行へ切り出す |
-| 監査要件が厳しくなる | 上場準備などで操作ログの改ざん防止や長期保管、承認の記録が求められる | 操作ログの保存先と保持期間の見直し、承認フローの追加（DB が必要になる）を検討 |
+| 監査要件が厳しくなる | 上場準備などで操作ログの改ざん防止や長期保管、承認の記録が求められる | 操作ログの保存先と保持期間の見直し、承認フローの追加（DB が必要になる）を検討。RDB が必要な場合は、別の社内アプリが使う Aurora に RDS Proxy で接続をプールする想定。 |
 
 ## 今後の展望
 
