@@ -305,7 +305,7 @@ DBを持たないことやLambdaで動かす以上、いくつかの制約は受
 
 
 ## 監視
-基盤の監視はCloudWatch Alarms を 4 つ置き、EventBridge → SNS → Slack に通知しています。
+基盤の監視はCloudWatch Alarms を 4 つ置き、EventBridge → SNS → Chatbot → Slack に通知しています。
 
 | アラーム | 条件 | 意味 |
 |---|---|---|
