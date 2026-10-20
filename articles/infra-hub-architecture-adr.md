@@ -108,10 +108,8 @@ Lambda は実行時間だけの課金で、待機中は 0 になります。
 ### Lambda Web Adapter で Next.js をそのまま動かす
 
 Lambda 向けにアプリを書き換えたくなかったので、Lambda Web Adapter（LWA）を使っています。
-LWA の実態は Go で書かれた 1 つの実行ファイルです。
-Lambda 拡張として起動し、Lambda Runtime API から受け取ったイベントを HTTP リクエストに変換してコンテナ内の `PORT` で待つ Web サーバへ転送し、返ってきた HTTP レスポンスを Lambda のレスポンス形式に戻します。
-つまり Lambda のイベント形式と普通の HTTP の間を往復変換するプロキシです。
-コンテナイメージに LWA を拡張として同梱すると、Function URL のリクエストを HTTP として `PORT` に橋渡ししてくれるので、Next.js の standalone サーバをそのまま起動できます。
+LWA は Lambda 拡張として動き、Function URL から来たリクエストを HTTP に変換してコンテナ内の `PORT` で待つ Next.js へ渡し、レスポンスを Lambda の形式に戻します。
+コンテナイメージに同梱するだけで、Next.js の standalone サーバをそのまま起動できます。
 
 ```dockerfile
 FROM public.ecr.aws/awsguru/aws-lambda-adapter:1.0.1 AS lwa
@@ -127,10 +125,7 @@ USER node
 CMD ["node", "server.js"]
 ```
 
-Lambda Web Adapter は `/opt/extensions/` に置いた Lambda 拡張（Lambda Extension）として動きます。
-Lambda の実行環境は起動時に `/opt/extensions/` 配下のファイルを拡張として起動し、Function URL から来たリクエストを HTTP に変換して `PORT` の Next.js へ渡します。
-この仕組みは Lambda の実行環境にしかないため、同じイメージをローカルで `docker run` すると `/opt/extensions/lambda-adapter` はただのファイルとして置かれたままになり、`CMD` の `node server.js` だけが動いて Next.js が 8080 番で直接リクエストを受けます。
-どちらでも Next.js 側は「8080 番で HTTP を受ける」だけで、Lambda 専用のハンドラやエントリポイントをコードに持っていません。
+拡張は Lambda の実行環境でしか起動しないため、同じイメージをローカルで `docker run` すると `CMD` の `node server.js` だけが動き、Next.js が 8080 番で直接リクエストを受けます。
 Lambda 向けの差分が拡張ファイル 1 つに閉じているため、Lambda 用に Dockerfile を分けたりハンドラを書いたりせず、普通の Web アプリと同じ Dockerfile のままで Lambda でもローカルでも動きます。
 
 ### CloudFront 経由であることの検証: `x-origin-verify` ヘッダ
