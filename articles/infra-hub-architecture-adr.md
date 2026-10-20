@@ -51,7 +51,7 @@ AWSだと、EventBridge Scheduler の定時起動停止で簡単に実現でき�
 1. 実行基盤の選定
 ```md
 - Lambda（コンテナイメージ + Lambda Web Adapter）+ Function URL + CloudFrontにし、常時稼働するコンピュートやネットワークリソースに依存しない
-  - 本記事を公開する前にLambda Web FunctionsがGAされたため、新しく作る場合はLambda Web Adapterを意識する必要性はないです。
+  - 本記事を公開する前にLambda Web Functionsが利用可能になったため、新しく作る場合はLambda Web Adapterを意識する必要性はないです。
   - Function URL は認可 NONE にし、CloudFront が origin へ付与する `x-origin-verify` ヘッダをアプリ側（proxy.ts）で検証する。
   - CloudFront を通らない直アクセスは 403 で弾く。
 ```
@@ -66,7 +66,7 @@ AWSだと、EventBridge Scheduler の定時起動停止で簡単に実現でき�
   
 3. 認可
 ```md
-- IAMロールで行い、マルチアカウントでの認可はハブ & スポーク。ハブの Lambda 実行ロールが、各 TEST アカウントのロールを AssumeRole する。
+- IAMロールで行い、マルチアカウントでの認可はハブ & スポーク。ハブの Lambda 実行ロールが、各 DEV アカウントのロールを AssumeRole する。
   - 起動・停止などの変更系を `infra-hub:managed=true` タグ付きリソースだけに許可し、本番やその他リソースは IAMで対象にしないことで分離する。
 ```
   
@@ -140,7 +140,7 @@ CloudFront が origin へのリクエストに AWS の署名を付け、署名�
 ただし、この方式で POST を通すには、ブラウザが毎回リクエスト本文のハッシュを計算して `x-amz-content-sha256` ヘッダに入れる必要があります。
 CloudFront はこのヘッダを作ってくれないため、画面の `fetch` に計算処理を足すことになります。
 IAM 署名で守る案はブラウザ側に余計な実装が要るので、代わりに CloudFront が origin へ付ける固定の共有シークレットヘッダ（`x-origin-verify`）をアプリで照合する方式にしました。
-シークレットの値は Secrets Manager に置き、アプリが起動時に取得します。
+シークレットの値は Secrets Manager に置き、アプリが最初のリクエストで取得してプロセス内に保持します。
 
 検証の流れは次のとおりです。
 
@@ -184,14 +184,14 @@ Workspace 側の設定が面倒なことに加え、別の社内 Web アプリ�
 
 ## 判断3. 認可は IAM ロールとハブ & スポーク
 
-ハブアカウントの Lambda 実行ロールが、各 TEST アカウントのスポークのIAMロールをAssumeRoleします。
+ハブアカウントの Lambda 実行ロールが、各 DEV アカウントのスポークのIAMロールをAssumeRoleします。
 スポーク側はハブのロールだけを信頼する設定のみで良いため、アカウントを追加するときも Terraform のモジュールを1つ足すだけで運用が楽にしたいため採用しました。
 
 一部のアカウントで取得に失敗しても残りは表示し、失敗したアカウントを画面で知らせます。
 1 アカウントの不具合で全体が見えなくならないようにしています。
 
 Route Handler は対象外アカウントへの要求を拒否し、スポークアカウントのロールを AssumeRole して AWS API を呼びます。
-スポーク側のロールは、読み取り系は無制限、変更系はタグ `infra-hub:managed=true` の付いたリソースだけに限定しています。
+スポーク側のロールは、読み取り系は Describe 系の API だけをタグ条件なしで許可し、変更系はタグ `infra-hub:managed=true` の付いたリソースだけに限定しています。
 
 ```hcl
 statement {
@@ -214,7 +214,7 @@ statement {
 }
 ```
 
-タグを付けるのは TEST 環境のリソースだけなので、本番リソースはそもそも操作できません。
+タグを付けるのは DEV 環境のリソースだけなので、本番リソースはそもそも操作できません。
 「UI 側で本番を除外する」ではなく「IAM で変更できない」にしています。
 
 変更系のほかに `cloudformation:GetTemplate` も許可しています。
