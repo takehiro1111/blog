@@ -50,24 +50,32 @@ AWSだと、EventBridge Scheduler の定時起動停止で簡単に実現でき�
 ### 判断したこと
 1. 実行基盤の選定
 ```md
-- Lambda（コンテナイメージ + Lambda Web Adapter）+ Function URL + CloudFrontにし、常時稼働するコンピュートやネットワークリソースに依存しない
-  - 本記事を公開する前にLambda Web Functionsが利用可能になったため、新しく作る場合はLambda Web Adapterを意識する必要性はないです。
-  - Function URL は認可 NONE にし、CloudFront が origin へ付与する `x-origin-verify` ヘッダをアプリ側（proxy.ts）で検証する。
+- Lambda（コンテナイメージ + Lambda Web Adapter）+ Function URL + CloudFrontにし、
+  常時稼働するコンピュートやネットワークリソースに依存しない
+  - 本記事を公開する前にLambda Web Functionsが利用可能になったため、
+    新しく作る場合はLambda Web Adapterを意識する必要性はないです。
+  - Function URL は認可 NONE にし、CloudFront が origin へ付与する
+    `x-origin-verify` ヘッダをアプリ側（proxy.ts）で検証する。
   - CloudFront を通らない直アクセスは 403 で弾く。
 ```
 
 2. 認証
 ```md
 - Auth.js + Google OIDCでアプリ側で直接受ける。
-  - 許可した Workspace ドメインかつメール検証済みのアカウントだけサインインでき、セッションは JWT（12 時間）
-  - Cognito + Google Workspace（外部 IdP）の SAML 認証で認証をインフラにオフロードする方向も検討したが、
-    Workspace側の設定が面倒なため、他の社内Webアプリで運用中のOIDCの方が良いとCTOと合意した。
+  - 許可した Workspace ドメインかつメール検証済みのアカウントだけサインインでき、
+    セッションは JWT（12 時間）
+  - Cognito + Google Workspace（外部 IdP）の SAML 認証で
+    認証をインフラにオフロードする方向も検討したが、
+    Workspace側の設定が面倒なため、
+    他の社内Webアプリで運用中のOIDCの方が良いとCTOと合意した。
 ```
   
 3. 認可
 ```md
-- IAMロールで行い、マルチアカウントでの認可はハブ & スポーク。ハブの Lambda 実行ロールが、各 DEV アカウントのロールを AssumeRole する。
-  - 起動・停止などの変更系を `infra-hub:managed=true` タグ付きリソースだけに許可し、本番やその他リソースは IAMで対象にしないことで分離する。
+- IAMロールで行い、マルチアカウントでの認可はハブ & スポーク。
+  ハブの Lambda 実行ロールが、各 DEV アカウントのロールを AssumeRole する。
+  - 起動・停止などの変更系を `infra-hub:managed=true` タグ付きリソースだけに許可し、
+    本番やその他リソースは IAMで対象にしないことで分離する。
 ```
   
 5. DBを持たない。
@@ -75,14 +83,18 @@ AWSだと、EventBridge Scheduler の定時起動停止で簡単に実現でき�
 - 操作ログは誰が・いつ・何を・結果 をCloudWatch Logs に残す
   - 状態は特定のタグを付与したリソースの Describe API から取得する。
   - ブラウザのタブを表示している間はポーリングで状態を更新する。
-    - 起動・停止の途中は 5 秒、安定時は 60 秒ごと。タブが非表示の間は止め、タブに戻った時に再取得する（SWR の `refreshWhenHidden` / `revalidateOnFocus` の既定値）。
-  - 今後、機能追加する際にDBが必要なケースが発生する場合は他の社内Webアプリで使用しているAuroraへRDS Proxyを用いて接続する。
+    - 起動・停止の途中は 5 秒、安定時は 60 秒ごと。
+      タブが非表示の間は止め、タブに戻った時に再取得する
+      （SWR の `refreshWhenHidden` / `revalidateOnFocus` の既定値）。
+  - 今後、機能追加する際にDBが必要なケースが発生する場合は
+    他の社内Webアプリで使用しているAuroraへRDS Proxyを用いて接続する。
 ```
 
 6. Next.js（App Router）を用いてFEとBEを分割しない設計にした。
 ```md
 - Route Handler が APIを叩き、同じコードベースに画面を置く。
-  - 現在考えている範囲ではAPIでもインフラ層の利用がメインになり、厳密にアプリケーションアーキテクチャを設計する必要性がないため。
+  - 現在考えている範囲ではAPIでもインフラ層の利用がメインになり、
+    厳密にアプリケーションアーキテクチャを設計する必要性がないため。
 ```
 
 以降、これらの判断をそれぞれ見ていきます。
