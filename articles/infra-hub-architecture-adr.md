@@ -151,6 +151,12 @@ Function URL を `AWS_IAM` にして CloudFront の OAC（Origin Access Control�
 CloudFront が origin へのリクエストに AWS の署名を付け、署名の無い直アクセスは Lambda が拒否する方式です。
 ただし、この方式で POST を通すには、ブラウザが毎回リクエスト本文のハッシュを計算して `x-amz-content-sha256` ヘッダに入れる必要があります。
 CloudFront はこのヘッダを作ってくれないため、画面の `fetch` に計算処理を足すことになります。
+AWS のドキュメントに次の記載があります。
+
+> Lambda 関数 URL で `PUT` または `POST` メソッドを使用する場合、ユーザーはリクエスト本文の SHA256 を計算し、CloudFront にリクエストを送信する際にそのペイロードハッシュ値を `x-amz-content-sha256` ヘッダーに含める必要があります。Lambda は署名されていないペイロードをサポートしていません。
+
+@[card](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-lambda.html)
+
 IAM 署名で守る案はブラウザ側に余計な実装が要るので、代わりに CloudFront が origin へ付ける固定の共有シークレットヘッダ（`x-origin-verify`）をアプリで照合する方式にしました。
 シークレットの値は Secrets Manager に置き、アプリが最初のリクエストで取得してプロセス内に保持します。
 
