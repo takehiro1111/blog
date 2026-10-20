@@ -3,7 +3,8 @@ title: "社内向けアプリケーションを個人開発してリリースし
 emoji: "🛠️"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS", "nextjs", "SRE", "Lambda", "PlatformEngineering"]
-published: false
+published: true
+publication_name: triplethree
 ---
 
 初めまして！
