@@ -79,7 +79,7 @@ AWSだと、EventBridge Scheduler の定時起動停止で簡単に実現でき�
     本番やその他リソースは IAMで対象にしないことで分離する。
 ```
   
-5. DBを持たない。
+4. DBを持たない。
 ```md
 - 操作ログは誰が・いつ・何を・結果 をCloudWatch Logs に残す
   - 状態は特定のタグを付与したリソースの Describe API から取得する。
@@ -91,7 +91,7 @@ AWSだと、EventBridge Scheduler の定時起動停止で簡単に実現でき�
     他の社内Webアプリで使用しているAuroraへRDS Proxyを用いて接続する。
 ```
 
-6. Next.js（App Router）を用いてFEとBEを分割しない設計にした。
+5. Next.js（App Router）を用いてFEとBEを分割しない設計にした。
 ```md
 - Route Handler が APIを叩き、同じコードベースに画面を置く。
   - 現在考えている範囲ではAPIでもインフラ層の利用がメインになり、
@@ -276,7 +276,7 @@ DB が無いので、操作ログは構造化 JSON で CloudWatch Logs に出し
 ![アプリの内側は 3 段だけ](/images/infra_hub/layers.png)
 
 Go などでバックエンドを別サービスに分ける案もありましたが、採りませんでした。
-理由は 2 つです。
+理由は以下です。
 
 - 共通のUIアプリケーションの側面が強いため、ドメインが薄い。
 - 「一覧・起動・停止」の 3 つしかなく、アプリ固有の永続モデルも無い。
