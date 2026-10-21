@@ -317,7 +317,7 @@ export const phaseOrder: Record<ResourceAction, readonly ResourceKind[]> = {
   - DB を持たず、リソースの状態は AWS API、セッションは JWT に置くため、アプリ内に漏れて困るデータが無い
 - 入口を絞る
   - CloudFront を通らない直アクセスは `x-origin-verify` で 403 にし、サインインは許可ドメインの Google アカウントだけにする
-- 認可で絞る
+- 認可で権限を絞る
   - 変更系の IAM 権限をタグ付きの DEV リソースに限定し、本番は IAM の時点で操作できない
 - 証跡を残す
   - 誰が何をしたかを CloudWatch Logs に残す
