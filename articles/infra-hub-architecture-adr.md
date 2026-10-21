@@ -321,6 +321,7 @@ export const phaseOrder: Record<ResourceAction, readonly ResourceKind[]> = {
   - 変更系の IAM 権限をタグ付きの DEV リソースに限定し、本番は IAM の時点で操作できない
 - 証跡を残す
   - 誰が何をしたかを CloudWatch Logs に残す
+  - S3 + Athena などへの出力も検討したが、対応コストに見合わないため意図的に CloudWatch Logs で済ませている
 
 ## 許容したリスク
 
