@@ -118,7 +118,7 @@ Lambda は実行時間だけの課金で、待機中は 0 になります。
 | App Runner | 最小インスタンスの常時課金が残る |
 | API Gateway + Lambda | リクエスト単位の課金が別に発生する。Function URL なら Lambda 以外の課金が無いため、少しでも課金要素を減らしたかった |
 | CloudFront に WAF を付ける | Web ACL とルールの固定費にリクエスト課金が乗る。社内数名の利用には見合わないため見送り |
-| Function URL を OAC（AWS_IAM）で保護 | POST のたびにブラウザ側で本文のハッシュをヘッダに付ける必要がある。代わりに CloudFront が付ける `x-origin-verify` ヘッダをアプリで検証する |
+| Function URL を OAC（AWS_IAM）で保護 | POST のたびにブラウザ側で本文のハッシュをヘッダに付ける必要がある。代わりに CloudFront が付ける `x-origin-verify` カスタムヘッダをアプリで検証する |
 
 ### Lambda Web Adapter で Next.js をそのまま動かす
 
