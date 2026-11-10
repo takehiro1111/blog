@@ -1,5 +1,5 @@
 ---
-title: "オブザーバビリティの課題から Datadog を選定し、設計・実装・運用するまで"
+title: "Datadogの選定・設計・実装・運用判断をした記録"
 emoji: "🐶"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Datadog", "SRE", "Observability", "ECS", "Terraform"]
@@ -9,228 +9,213 @@ publication_name: triplethree
 
 ![](/images/datadog/logo.png =400x)
 
+TRIPLE THREEで主にSREとして働いているtakehiro1111です！  
+弊社ではオブザーバビリティツールとしてDatadogを運用しています。
+
+今回はDatadogの導入前後で考えたことを記録として残しいこうと思います！
+特にツールは何を選ぶか正解がない中での対応になるため、事例として少しでもお役に立てれば嬉しいです！
 
 ## この記事で書くこと
-弊社ではオブザーバビリティツールとしてDatadogを運用しています。
-今年の6月頃から導入しているのですが、なぜDatadogを使用しているのかを振替し判断記録として残したいと思います。
-
-- 導入前時点での状況と課題
-- オブザーバビリティツールとしてのDatadogを選定するまでに考えたこと、判断基準
-- 導入時に設計で決めたこと
+- 導入前の状況や課題
+- Datadogの選定で考えたこと、判断基準
+- 導入時点での設計判断
 - 実装でやったこと、ハマったこと
-- 運用して分かったこと
+- 運用して感じたこと
 - 残っている課題
 
 ## 前提
 弊社のメインプロダクトで採用している技術スタックと運用体制です。
 
-- FE: TypeScript（React）
-- BE: Go（chi）
-- インフラ: AWS(ECS Fargate)
+- FE: TypeScript, React
+- BE: Go
+- DB: MySQL(Aurora)
+- Infra: AWS(ECS Fargate)
 - IaC: AWS CDK
-- 運用体制: 開発者がインフラも含めて技術横断的に対応し、CTO が強い権限を持っている
+- 役割: 開発者がインフラも含めて技術横断的に対応しています。
+- 開発体制: CTO + 開発者複数名 + SRE1名
+- AI: Claude Codeを中心にAIをフル活用してスピード感を持って開発に取り組んでいます。
 
-## 導入前に抱えていた課題
+## 導入前に抱えていた主な課題
+1. 少人数体制のため、専任のSREがおらず横断的にプロダクトの基盤を整備する工数が作れない。
+2. CloudWatchでエラーログを見たり、メトリクスのアラートを通知するだけに留まり、ユーザー目線での可観測性を得られてない。
 
-一番大きかったのは、監視の大方針が決まっていなかったことです。
-AWS のサービスに寄せるのか、SaaS を使うのかが決まっていないため、ログ・メトリクス・監視の整備がどれも進められない状態でした。
+## 1. Datadogの選定で考えたこと、判断基準
+### 当初の経緯
+私がTRIPLE THREEに参画した2026/5に調査から始めました。
+課題の洗い出しや弊社にとってどんな状態が望ましいかを考えながら整理し、その課題を解決するための
+手段となりそうなツールの特徴を調査,整理し、CTO中川と二人三脚で最終的な方向性を決めていきました。
 
-ログは各アプリが CloudWatch Logs に出しているだけでした。
-後で棚卸しすると、バックエンド 6 プロダクトのうち 4 つはアクセスログ自体が出ておらず、残りの 2 つも旧形式の属性で全て Info レベルだったり、4xx しか出ていなかったりしました。
 
-また、ゴールデンシグナル（レイテンシ・トラフィック・エラー・サチュレーション）で測れない異常を拾えないことも課題でした。
-応募者とのチャット機能で 400 系のエラーが出ていたものの、アラートでは検知できず、修正までに気付くのが遅れた事象がありました。
+### 調査(約2週間)
+調査段階では導入前の時点での状況を整理し、開発組織やプロダクトにとってどんな状態であるべきかを考えました。
 
-## 1. 選定
+どうありたいかという点はCTOと壁打ちしながら擦り合わせしましたが、元から一定の共通認識は持てていたため、擦り合わせにはさほど時間がかかることはありませんでした。
 
-### 考えたこと
+そのため、手段としてオブザーバビリティを獲得するためのツールの調査に時間をかけました。
+各ツールの特徴を整理し、比較しながら消去法で絞っていく進め方で対応しました。
 
-2026年5月から可観測性の調査を始めました。
-最初に決める必要があったのは「AWS に寄せるか、SaaS を使うか」です。
+実際に調べたツールは以下です。
 
-AWS のサービスで組む案として、次の 3 つを検討しました。
+| 区分 | ツール | 構成・特徴 | 気になった点 |
+|---|---|---|---|
+| AWS | S3 + Athena + Redash | ログをS3に置いてクエリする | 容量の上限、ライフサイクルポリシー、ストレージクラスの設計を自分たちで持つ必要がある。即時検索には向いてない。 |
+| AWS | Data Firehose + OpenSearch + Kibana | Fluent Bitで送ったログをOpenSearchに集約して検索する | OpenSearchの固定費が高い。Kibanaのテンプレート管理の工数も必要になる。 |
+| AWS | CloudWatch Logs + Lambda | ERRORなどのログを検知してSlackに通知する | Lambdaのコード保守や、リトライ・冪等性の設計が必要。 |
+| AWS | CloudWatch Logs + Insights / Dashboard | CloudWatchのコンソールで検索・可視化する | ログ・メトリクス・トレースを横断して辿るのが難しい。標準SQLではない独自のクエリ言語をキャッチアップする手間。 |
+| SaaS | Datadog | ログ・APM・インフラ・RUMを1つにまとめる | ツールとして魅力的だが、課金項目が多く、試算で約9〜13万円/月と他手段と比較するとコストが高くなる想定。 |
+| SaaS | New Relic | 取り込みデータ量とユーザー数で課金 | ユーザー数に応じた課金形態。 |
+| SaaS | Mackerel | 国産のインフラ監視で、日本語サポートがある | APM・分散トレースはDatadog / New Relicほど充実していない。 |
+| SaaS | Sentry | アプリのエラー監視 | インフラメトリクスは対象外。 |
+| SaaS | Dynatrace | エンタープライズ向けの統合プラットフォーム | 1〜3年の年間コミット契約が前提で、UIも開発者には馴染みにくい。 |
+| OSS | Prometheus + Alertmanager + Grafana | ECS Fargateでセルフホストしてメトリクス監視・通知・可視化をする | 3つとも自分たちで構築・運用する必要があり、運用コストが高い。 |
+| OSS | Uptime Kuma | ECS FargateでセルフホストしてURL監視をする | SQLite前提で冗長化できず、Uptime Kuma自体の監視も必要。 |
 
-| 案 | 構成 | 気になった点 |
-|---|---|---|
-| S3 + Athena + Redash | ログを S3 に置いてクエリする | 容量の上限、ライフサイクルポリシー、ストレージクラスの設計を自分たちで持つ必要がある |
-| Firehose + OpenSearch | ログを OpenSearch に集約して検索する | OpenSearch の固定費が高い |
-| CloudWatch | CloudWatch Logs と CloudWatch Dashboard | ログ・メトリクス・トレースを横断して辿るのが難しい |
+この中から、費用と機能, 運用工数のバランスでNew Relic / Sentry / Datadogを比べていきました。
 
-SaaS は Datadog / New Relic / Mackerel / Sentry / Dynatrace の機能と料金を調べました。
+New Relicは課金がホスト数ではなく取り込みデータ量とユーザー数で決まり、月100GBの無料枠があります。
+今の規模なら無料枠に収まる可能性が高く、費用面ではDatadogより有力でした。
+ただ、アカウント数での課金を避けたい弊社の方針とは合わず最終候補からは外しました。
 
-New Relic は課金がホスト数ではなく取り込みデータ量とユーザー数で決まり、月 100GB の無料枠があります。
-トラフィックが小さい今の規模なら無料枠に収まる可能性が高く、費用面では最も有力でした。
-
-Sentry はアプリ内部のエラー監視が本職で、CPU やメモリなどのインフラメトリクスは守備範囲外です。
+Sentryはアプリ内部のエラー監視が本職で、CPUやメモリなどのインフラメトリクスは守備範囲外です。
 トレース・メトリクス・ログを紐付けて辿ることもできません。
+AWSと補完しながら運用する前提で最終候補に残しました。
 
-Datadog は機能の幅と、エラー → トレース → ログ → インフラを 1 画面で辿れる点が強みです。
-一方で、課金項目が 10 種類以上あり、監視対象や機能を増やすほど費用が積み上がる点が懸念でした。
-
-Datadog とは見積もりの段階でやり取りをしました。
-Lambda は 1 時間に 1 回以上実行された関数がアクティブ関数として課金されること、ログは取り込みとインデックス化を切り離す Logging without Limits の考え方で、保持期間 30 日を前提にすることを確認しました。
-Lambda で動かしているのは一部の機能だけなので、Lambda は Datadog の監視に含めず CloudWatch でエラーログを見る形で良いと判断しました。
+Datadogは機能の豊富さやAIネイティブな開発との相性, トレース・メトリクス・ログを結びつけてユーザーの行動を辿ることができ
+ビジネス的にスケールするための狙いとしても魅力はありました。
+一方で、課金項目が多数あり、監視対象や機能を増やすほど費用が想定より上がる可能性が高い点が懸念でした。
 
 ### 判断基準
+判断基準にしたのは次の7つです。
 
-判断基準にしたのは次の 4 つです。
+#### 1. 導入と運用時の工数を抑えられるか 
+  - 中長期的にもオブザーバビリティツールの保守に割く時間を減らしたい
+  - 用途によってプラットフォームを分けず、開発者の負担を最小限に運用できるか。
 
-- 監視基盤の構築・運用工数を抑えられるか
-  - インフラ・SRE 担当が少人数なので、監視基盤そのものを自前で組んで運用する余力が無い
-- 障害対応を速くできるか
-  - HR プロダクトとして安定稼働が重要で、障害時に原因まで辿り着く時間を短くしたい
+#### 2. 障害や不具合を検知できる仕組みが作れるか
+  - 障害時に復旧と原因まで辿り着く時間を短くしたい
+
+#### 3. 情報を取得する際のUI/UXが良いか
 - ログ・トレース・メトリクスを紐付けて辿れるか
-  - 冒頭の「ゴールデンシグナルで測れない異常」に気付くには、1 つのエラーから関連する情報を横断して見る必要がある
-- 費用が見合うか
+  - 従来のインフラ周りの監視だけでなく、可観測性の文脈で必要な情報を把握しユーザー目線で改善に向けた取り組みに繋げられるか。
+
+#### 4. コストとリターンが見合いそうか
+- 開発組織と課金体系の相性
+  - アカウント数での課金は避けたい。
+
+
+#### 5. AI駆動の開発組織での相性
+- 従来のロギング, メトリクスの収集や通知だけではなく、
 
 ### 選定結果
-
-6 月 1 日の時点で、候補は次の 2 案に絞られました。
+最終候補は次の2案に絞られました。
+可観測性をしっかり実現してより成長を見据えた投資をするか、目先の費用とプロダクトのフェーズを考えた妥協案の
+2つの選択肢が残りました。
 
 ```md
-A. Sentry + AWS の機能（OpenSearch など費用の高いサービスは使わない）
-  → 月 3〜5 万円（仮）
+A. Sentry + AWS(CloudWatch, Athena, S3)
+  → 約3〜5万円/月
 
-B. Datadog で統合
-  → 月 9〜13 万円程度
+B. Datadogで統合
+  → 約9〜13万円/月
 ```
 
-可観測性をしっかり実現するなら B 案、費用とプロダクトのフェーズを考えた妥協案が A 案という整理です。
+最終的には目先のコストを抑える方向ではなく、より事業成長を加速させたいという考え方からDatadogを選定しました。
+AIネイティブな開発スタイルと開発者がプロダクトの信頼性向上にコミットする組織体制の方針に合うという判断です。
 
-<!-- TODO: A 案と B 案から Datadog に決めた理由（決め手）を記入する。Notion の MTG サマリには記載が見つからなかった -->
-最終的に Datadog を選びました。
+この時点でCTOが予算取りの調整も並行して進めていただきスピード感持って実現できた判断のため、本当に感謝しています。
 
 ## 2. 設計
-
-6 月 8 日から導入作業に入り、次のことを決めました。
+スモールスタートで小さく早く運用開始することを優先とし、大枠として以下内容で実装, 設定しました。
 
 ```md
 1. 計装と設定の責務を分ける
-  - 計装（Agent・ログ転送・APM・RUM）は各プロダクトのアプリと CDK で行う
+  - 計装（Agent・ログ転送・APM・RUM）は各プロダクトのアプリとCDKで行う
   - 収集したデータに対する monitor / dashboard / SLO などの設定は、
-    Datadog 専用の Terraform リポジトリで管理する
+    DatadogのTerraform専用リポジトリで管理する
 
-2. ECS には Datadog Agent と Fluent Bit をサイドカーで入れる
-  - Agent が止まってもアプリは止めない
-  - Fluent Bit が止まったらタスクごと止め、ログを取りこぼさない
+2. ECSにDatadog AgentとFluent Bitをサイドカーで入れる
+  - Datadog Agentが止まってもアプリは止めないよう可用性を重視。
+  - Fluent Bitが止まったらタスクごと止め、ログを取れない状況は作らない。
 
 3. APM は Orchestrion による自動計装にする
-  - ベンダーロックインは当面気にせず、Datadog に寄せる
+  - ベンダーロックインは当面気にせず、Datadogのライブラリの実装に寄せる。
+  - 運用フェーズで必要に応じて、部分軽装やOtelでの軽装に移行する。
 
-4. service / env タグを Agent・ログ・トレースで揃える
+4. service / env タグをAgent・ログ・トレースで揃える
 
 5. アラートの優先度を P1〜P5 で定義する
+- CTOや各プロダクトの開発者と一緒に決めました。
+- 事前に全てを厳密に定義するよりも、p1-p3の定義しまずは設定して走りながら改善する方針で対応。
+- ASK Bitsで設定しました。
 
-6. ログは INFO も取り込み、不要なものは index から外す
+6. ログはINFOも取り込み、不要なものはindexから外す。
+
+7. 2週間のトライアル期間に色々検証したいためめ、運用までのリードタイムを短くする観点で
+   Terraformでの構成管理は運用開始後にimportで対応する。
 ```
 
 ### 計装と設定の責務を分ける
+計装はアプリの実装やECSのタスク定義に依存するため、各プロダクトのリポジトリに置くのが自然です。
+一方で、monitorやdashboardはプロダクトを横断して同じ形で揃えたいものです。
+各プロダクトのリポジトリに散らばると、通知メッセージや閾値の考え方を揃えるたびに全リポジトリを直すことになります。
+そのため、Datadog上の設定だけは1つのリポジトリにまとめました。
 
-計装はアプリの実装や ECS のタスク定義に依存するため、各プロダクトのリポジトリに置くのが自然です。
-一方で、monitor や dashboard はプロダクトを横断して同じ形で揃えたいものです。
-各プロダクトのリポジトリに散らばると、通知文面や閾値の考え方を揃えるたびに全リポジトリを直すことになります。
-そのため、Datadog 上の設定だけは 1 つのリポジトリにまとめました。
+### ECSにはAgentとFluent Bitをサイドカーで入れる
 
-### ECS には Agent と Fluent Bit をサイドカーで入れる
-
-ログだけでなくメトリクスと APM も取り込みたいため、Datadog が提供する CDK の Construct（`datadog-cdk-constructs-v2` の `DatadogECSFargate`）を使いました。
+ログだけでなくメトリクスとAPMも取り込みたいため、Datadogが提供するCDKのConstruct（`datadog-cdk-constructs-v2`の`DatadogECSFargate`）を使いました。
 タスク定義を直接書き換えるより記述量が少なく、各プロダクトへ横展開しやすいことも理由です。
 
-Agent とログルーターでは、止まった時の扱いを逆にしています。
+Agentとログルーターでは、止まった時の扱いを逆にしています。
 
-- Agent（`isDatadogEssential: false`）
-  - Agent が止まってもアプリのコンテナは動き続ける。監視のためにサービスを止めない
-- Fluent Bit（`isLogRouterEssential: true`）
-  - Fluent Bit が止まったらタスクごと止めて再起動させる。ログの取りこぼしを避ける
+- Datadog Agent
+  - Agentが止まってもアプリのコンテナは動き続ける。
+  - 監視のためにサービスを止めない
+- Fluent Bit
+  - Fluent Bitが止まったらタスクごと止めて再起動させる。
+  - ログの取りこぼしを避ける
 
-### APM は自動計装にする
+### APMは自動計装にする
 
-Go アプリの APM は、Orchestrion によるコンパイル時の自動計装にしました。
-`orchestrion go build` がビルド時に `net/http`・`go-chi`・`database/sql` などへスパンを作るコードを挿入するため、アプリのコードを変更せずにトレースを送れます。
+GoアプリのAPMは、Orchestrionによるコンパイル時の自動計装にしました。
+`orchestrion go build`がビルド時に`net/http`・`go-chi`・`database/sql`などへスパンを作るコードを挿入するため、アプリのコードを変更せずにトレースを送れます。
 
-手動計装に切り替える時にベンダーロックインをどこまで避けるかも議論しましたが、現段階では気にせず Datadog に寄せる方針にしました。
+手動計装に切り替える時にベンダーロックインをどこまで避けるかも議論しましたが、現段階では気にせずDatadogに寄せる方針にしました。
 手動計装は、運用の中で自動計装では足りない課題が出てから対応します。
 
-### service / env タグを揃える
+### service / envタグを揃える
 
-`service` と `env` の値が Agent・ログ・トレースでずれると、同じサービスとして紐付かず、横断検索もできなくなります。
-そのため CDK の中で service 名を 1 つの変数にし、Agent とログドライバの両方に同じ値を渡すことにしました。
+`service`と`env`の値がAgent・ログ・トレースでずれると、同じサービスとして紐付かず、横断検索もできなくなります。
+そのためCDKの中でservice名を1つの変数にし、Agentとログドライバの両方に同じ値を渡すことにしました。
 
-### アラートの優先度を P1〜P5 で定義する
+### アラートの優先度をP1〜P5で定義する
 
 | Priority | 基準 |
 |---|---|
 | P1 | ユーザーがサービスを利用できない |
-| P2 | 一部機能に影響がある、または放置すると P1 になる |
+| P2 | 一部機能に影響がある、または放置するとP1になる |
 | P3 | 品質劣化はあるが機能は使える |
 | P4 | 将来的にリスクになる兆候 |
 | P5 | 情報収集・改善提案 |
 
-Synthetics / APM / Log / RUM などの種類ごとに、どの事象をどの優先度にするかを対応付けました。
-P1 は専用の Slack チャンネルにも通知し、それ以外と見分けられるようにしています。
+Synthetics / APM / Log / RUMなどの種類ごとに、どの事象をどの優先度にするかを対応付けました。
+P1は専用のSlackチャンネルにも通知し、それ以外と見分けられるようにしています。
 
 ## 3. 実装
 
-### ECS のサイドカー設定
+### ECSのサイドカー設定
 
-`DatadogECSFargate` の設定は次のようになりました。
+いくつかハマりました。
 
-```ts
-const ddService = projectHyphen;
+1つ目は、ログがJSONとして解釈されなかったことです。
+アプリはslogのJSON構造化ログを標準出力に出していますが、`isParseJson`がデフォルトのfalseだとFluent Bitは1行をただの文字列として送ります。
+Datadog上ではJSONがmessageの文字列のまま入り、`@http.method`や`@http.status_code`のような属性で検索できませんでした。
 
-const datadog = new DatadogECSFargate({
-  apiKeySecret: props.datadogApiKeySecret,
-  imageVersion: "7.79.2",
-  site: "ap1.datadoghq.com",
-  isDatadogEssential: false,
-  env,
-  service: ddService,
-  globalTags: `env:${env},region:ap-northeast-1`,
-  apm: {
-    isEnabled: true,
-    isSocketEnabled: true,
-    traceInferredProxyServices: true,
-  },
-  dogstatsd: {
-    isEnabled: true,
-    isOriginDetectionEnabled: true,
-    isSocketEnabled: true,
-  },
-  logCollection: {
-    isEnabled: true,
-    loggingType: LoggingType.FLUENTBIT,
-    fluentbitConfig: {
-      isLogRouterEssential: true,
-      firelensOptions: {
-        isParseJson: true,
-      },
-      logDriverConfig: {
-        hostEndpoint: "http-intake.logs.ap1.datadoghq.com",
-        serviceName: ddService,
-        sourceName: "go",
-      },
-    },
-  },
-});
-```
-
-この設定に落ち着くまでに、いくつかハマりました。
-
-1 つ目は、ログだけが Datadog に届かなかったことです。
-Construct のログ送信先の既定値は US1 の intake で、`site` を ap1 にしても連動しません。
-そのためログだけ US1 に送られ、AP1 の API キーで弾かれていました。
-`hostEndpoint` で AP1 の intake を明示して解消しました。
-
-2 つ目は、ログが JSON として解釈されなかったことです。
-アプリは slog の JSON 構造化ログを標準出力に出していますが、`isParseJson` が既定の false だと Fluent Bit は 1 行をただの文字列として送ります。
-Datadog 上では JSON が message の文字列のまま入り、`@http.method` や `@http.status_code` のような属性で検索できませんでした。
-
-3 つ目は、`serviceName` / `sourceName` を指定しないと、アプリのコンテナのログが service 空・`source:undefined` で取り込まれることです。
+2つ目は、`serviceName` / `sourceName`を指定しないと、アプリのコンテナのログがservice空・`source:undefined`で取り込まれることです。
 これではトレースと紐付きません。
 
-4 つ目は、CDK の synth が落ちたことです。
-`isLogRouterEssential: true` にすると、essential なログルーターのコンテナがアプリより先にタスク定義へ追加され、タスク定義の既定のコンテナになります。
-ALB のターゲットを暗黙で指定していると、ポートを持たないログルーターに紐付こうとしてエラーになります。
+3つ目は、CDKのsynthが落ちたことです。
+`isLogRouterEssential: true`にすると、essentialなログルーターのコンテナがアプリより先にタスク定義へ追加され、タスク定義の既定のコンテナになります。
+ALBのターゲットを暗黙で指定していると、ポートを持たないログルーターに紐付こうとしてエラーになります。
 アプリのコンテナとポートを明示的にターゲットに指定して解消しました。
 
 ```ts
@@ -242,141 +227,71 @@ targets: [
 ],
 ```
 
-サイドカーが増える分、CPU / メモリが逼迫して起動できない、OOM になる、性能が落ちる可能性もあります。
-その場合はタスク定義の `cpu` / `memory` を増やす前提で各プロダクトへ展開しました。
+サイドカーが増える分、CPU / メモリが逼迫して起動できない、OOMになる、性能が落ちる可能性もあります。
+その場合はタスク定義の`cpu` / `memory`を増やす前提で各プロダクトへ展開しました。
 
-### Orchestrion による自動計装
+### Orchestrionによる自動計装
 
-アプリ側の変更は、`orchestrion.tool.go` の追加と Dockerfile のビルドコマンドの置き換えだけです。
+アプリ側の変更は、`orchestrion.tool.go`の追加とDockerfileのビルドコマンドの置き換えだけです。
 
-```go
-//go:build tools
-
-//go:generate go run github.com/DataDog/orchestrion pin -generate
-
-package tools
-
-import (
-	_ "github.com/DataDog/orchestrion"
-	_ "github.com/DataDog/dd-trace-go/orchestrion/all/v2"
-)
-```
-
-```diff docker
- FROM base AS builder
-+RUN go install github.com/DataDog/orchestrion
-+COPY orchestrion.tool.go .
- COPY cmd/ ./cmd/
--RUN GOOS=linux GOARCH=arm64 CGO_ENABLED=1 go build -v -o /work/target ./cmd/...
-+RUN GOOS=linux GOARCH=arm64 CGO_ENABLED=1 orchestrion go build -v -o /work/target ./cmd/...
-```
-
-`go install` にバージョンを付けないことで、`go.mod` に固定したバージョンの Orchestrion が使われます。
-Orchestrion の対応バージョンに合わせて、Go は 1.25 に引き上げました。
-
-### Datadog の設定を Terraform で管理する
-
-7 月の頭に datadog-terraform リポジトリを作りました。
-Datadog 上には、画面や API から作られた monitor・dashboard が既にあったため、まず既存のリソースを import してコードに移しました。
-
-state はプロダクト単位で分け、プロダクト横断の dashboard やログの設定は `shared/` 配下に置いています。
-
-```
-aws/            tfstate の S3 バケット、CI 用の IAM ロール、API キーの Secrets Manager
-<product>/prod/ プロダクトごとの monitor と RUM application
-shared/         dashboard、ログの index / pipeline、コスト監視など org 共通の設定
-modules/        通知文面の共通テンプレートなど
-```
-
-PR で `terraform plan` を実行して結果をコメントに出し、マージで `terraform apply` する流れは Digger で組みました。
-provider や Terraform のバージョンは Renovate で自動更新しています。
-
-monitor の通知文面は、プロダクトをまたいでほぼ同じになります。
-各プロダクトの `monitor.tf` に直書きすると、文面を改善するたびに全プロダクトへ横展開が必要になるため、`alert_message` モジュールに共通のテンプレートを置きました。
-プロダクト側は service 名・env・通知先だけを渡します。
-
-```hcl
-module "alert_message" {
-  source = "../../modules/alert_message"
-
-  service_backend      = "triple-report-backend"
-  env                  = "production"
-  product_display_name = "TRIPLE REPORT"
-  # ...
-}
-
-resource "datadog_monitor" "apm_error_rate" {
-  name     = "[TRIPLE REPORT BE] APM エラー率が高い"
-  type     = "query alert"
-  priority = 1
-  message  = module.alert_message.body.apm_error_rate
-  # ...
-}
-```
-
-テンプレートは「発生内容 → 重大度 → 影響 → 対応手順」の順に揃え、通知を見た時点で何をすれば良いか分かるようにしています。
+Orchestrionの対応バージョンに合わせて、Goは1.25に引き上げました。
 
 ### ログの標準化
 
-Datadog にログが届くようになった後、7 月末から 6 プロダクトのアクセスログを整備しました。
+Datadogにログが届くようになった後、7月末から6プロダクトのアクセスログを整備しました。
 
-- 属性を Datadog の標準属性（`http.method` / `http.status_code` / `duration` など）に揃える
+- 属性をDatadogの標準属性（`http.method` / `http.status_code` / `duration`など）に揃える
 - ステータスコードに応じてログレベルを分ける
-- `http.route` に chi のルートパターンを入れ、エンドポイント単位で集計できるようにする
-- ログにトレース ID を付け、ログとトレースを双方向に辿れるようにする
+- `http.route`にchiのルートパターンを入れ、エンドポイント単位で集計できるようにする
+- ログにトレースIDを付け、ログとトレースを双方向に辿れるようにする
 
-アクセスログの 5xx を検知する専用の monitor も 8 月に追加しました。
-monitor は新旧どちらの属性でも拾えるように書き、アプリの修正がデプロイされる前から有効になるようにしています。
+アクセスログの5xxを検知する専用のmonitorも8月に追加しました。
+monitorは新旧どちらの属性でも拾えるように書き、アプリの修正がデプロイされる前から有効になるようにしています。
 
-### ログの PII の除去
+### ログのPIIの除去
 
-整備の途中で、ログにメールアドレスや JWT などの個人情報・資格情報が平文で出ている箇所が見つかりました。
+整備の途中で、ログにメールアドレスやJWTなどの個人情報・資格情報が平文で出ている箇所が見つかりました。
 本筋はアプリ側で出さないことなので、各プロダクトのコードを修正しました。
-それに加えて、取りこぼしを受け止める保険として、Datadog Sensitive Data Scanner（取り込み時にマスク）で JWT とメールアドレスを伏せ字にしています。
+それに加えて、取りこぼしを受け止める保険として、Datadog Sensitive Data Scanner（取り込み時にマスク）でJWTとメールアドレスを伏せ字にしています。
 
 ## 4. 運用
 
 ### アラートの棚卸し
 
-導入して 2 か月ほど経った 9 月に、直近 7 日間のアラート発報をプロダクト横断で棚卸ししました。
-
-分かったのは、全アラートの 80% が RUM の 5 つの monitor から出ていて、しかも通知先が設定されていなかったことです。
-誰にも届かないアラートが大半を占めていました。
-他にも、正常な処理を ERROR で記録しているためにエラーログの monitor が何度も発報しているケースや、通知先が個人のメールだけになっている monitor が見つかりました。
 
 <!-- TODO: 通知先の修正（RUM 5 モニター・Apdex モニター）がその後マージされたか確認する。datadog-terraform の main の履歴には見当たらなかった -->
-棚卸しの結果から、RUM の monitor に通知先を設定する修正などを進めました。
+棚卸しの結果から、RUMのmonitorに通知先を設定する修正などを進めました。
 
-閾値は、棚卸しの前の 9 月上旬に、プロダクトごとの実測値に合わせて較正しています。
+閾値は、棚卸しの前の9月上旬に、プロダクトごとの実測値に合わせて較正しています。
 
 ### コストの監視
 
-Datadog の懸念だった費用は、利用量のメトリクス（`datadog.estimated_usage.*` など）で監視しています。
-課金のモデルが SKU ごとに違うため、監視の仕方も分けました。
+Datadogの懸念だった費用は、利用量のメトリクス（`datadog.estimated_usage.*`など）で監視しています。
+課金のモデルがSKUごとに違うため、監視の仕方も分けました。
 
 | 課金モデル | 例 | 監視の仕方 |
 |---|---|---|
-| コミット枠なし（使った分がそのままオンデマンド課金） | Infra Hosts / Ingested Logs | 実測の 2〜3 倍に置いた急増ガード |
-| コミット枠あり（超過分がオンデマンド課金） | Fargate / RUM / Indexed Logs | 枠の 80%（warning）/ 90%（critical）で通知 |
+| コミット枠なし（使った分がそのままオンデマンド課金） | Infra Hosts / Ingested Logs | 実測の2〜3倍に置いた急増ガード |
+| コミット枠あり（超過分がオンデマンド課金） | Fargate / RUM / Indexed Logs | 枠の80%（warning）/ 90%（critical）で通知 |
 
-月の累計は、請求のカレンダー月と揃うよう月初起点の `current_1mo` で評価しています。
-コストの超過は障害ではないため、P1 の通知先には流さず priority は 3 にしています。
+月の累計は、請求のカレンダー月と揃うよう月初起点の`current_1mo`で評価しています。
+コストの超過は障害ではないため、P1の通知先には流さずpriorityは3にしています。
 
 ## 残っている課題
 
-- SLO はまだ設定できていない
-- test 環境のデータは Datadog に送っておらず、本番だけを見ている
-- アプリログは、エラーを `error.message` / `error.kind` / `error.stack` に入れる形への移行と、トレース ID を付けるための ctx 付きロガーへの移行が残っている
-- ユーザー ID（`usr.id`）を Logs / APM / RUM で同じ値・同じ型に揃えられておらず、ユーザー単位での横断検索ができない
-- AWS インテグレーションは CloudWatch API の費用を抑えるため一部に絞っており、ALB や RDS の CloudWatch メトリクスは Datadog で見ていない
+- SLOはまだ設定できていない
+- test環境のデータはDatadogに送っておらず、本番だけを見ている
+- アプリログは、エラーを`error.message` / `error.kind` / `error.stack`に入れる形への移行と、トレースIDを付けるためのctx付きロガーへの移行が残っている
+- ユーザーID（`usr.id`）をLogs / APM / RUMで同じ値・同じ型に揃えられておらず、ユーザー単位での横断検索ができない
+- AWSインテグレーションはCloudWatch APIの費用を抑えるため一部に絞っており、ALBやRDSのCloudWatchメトリクスはDatadogで見ていない
 
 ## 最後に
-
-<!-- TODO: 振り返り・今後の展望 -->
+正直なところ、最低限の部分しか整備できていないため、コストとも相談しながら
+より使いこなしていきたいです！
 
 ## We're Hiring!
 
-TRIPLE THREE では、少人数 × AI 前提で開発も業務も回す仲間を募集しています！
+TRIPLE THREEでは、少人数 × AI前提で開発も業務も回す仲間を募集しています！
 カジュアル面談もやっているので、話だけでも聞いてみたい！という方も大歓迎です。
 興味のある方は是非のぞいてみてください！
 
