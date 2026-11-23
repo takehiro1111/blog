@@ -359,7 +359,7 @@ Datadogで予めコミットしている設定以外のものを使用してい�
 
 ![](/images/datadog/cost_board3.png)
 
-### 4-4. Claude Codeでのアラートの一次調査
+### 4-4. Claude Codeでのアラートの一次調査の自動化
 
 弊社には`TRIPLE ASK`という、Slackでメンションすると裏でClaude Codeが動く社内Botがあります。
 DatadogのアラートがSlackに通知されると、ASKがログ・トレース・コードを調べて、スレッドに調査結果を返してくれます。
