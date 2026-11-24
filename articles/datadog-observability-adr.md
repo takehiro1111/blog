@@ -365,7 +365,7 @@ Datadogで予めコミットしている設定以外のものを使用してい�
 
 弊社には`TRIPLE ASK`という、Slackでメンションすると裏でClaude Codeが動く社内Botがあります。
 DatadogのアラートがSlackに通知されると、ASKがログ・トレース・コードを調べて、スレッドに調査結果を返してくれます。
-詳細はこちらの記事をご覧ください！
+気になる方はこちらの記事をご覧ください！
 
 @[card](https://zenn.dev/triplethree/articles/d6a9a9d6935256)
 
