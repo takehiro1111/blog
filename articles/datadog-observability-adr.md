@@ -159,15 +159,18 @@ B. Datadogで統合
 
 AgentとFluent Bit（ログルーター）では、止まった時の扱いを逆にしています。
 
-- Datadog Agent
-  - トレースとメトリクスをDatadogへ送る。
-  - Agentが止まってもアプリのコンテナは動き続ける。
-  - トレースとメトリクスの収集のためにサービスを止めないよう、可用性を重視。
-- Fluent Bit
-  - アプリのログを、Agentを通さずにDatadogへ直接送る。
-  - Fluent Bitが止まったらタスクごと止め、ECSのサービスに新しいタスクを起動させる。
-  - ログの取りこぼしを避けたい。
-  - AWSの[ドキュメント](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/firelens-taskdef.html)でも、ログルーターのコンテナは必須コンテナ（止まるとタスクごと止まるコンテナ）にすることが推奨されている。
+#### Datadog Agent
+
+- トレースとメトリクスをDatadogへ送る。
+- Agentが止まってもアプリのコンテナは動き続ける。
+- トレースとメトリクスの収集のためにサービスを止めないよう、可用性を重視。
+
+#### Fluent Bit
+
+- アプリのログを、Agentを通さずにDatadogへ直接送る。
+- Fluent Bitが止まったらタスクごと止め、ECSのサービスに新しいタスクを起動させる。
+- ログの取りこぼしを避けたい。
+- AWSの[ドキュメント](https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/firelens-taskdef.html)でも、ログルーターのコンテナは必須コンテナ（止まるとタスクごと止まるコンテナ）にすることが推奨されている。
 
 サイドカーが増える分、CPU / メモリが逼迫して起動できない、OOMになる、性能が落ちる等の可能性もあります。  
 その場合はタスク定義のスペックを増やす前提で各プロダクトへ展開しました。
