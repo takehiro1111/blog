@@ -9,7 +9,7 @@ publication_name: triplethree
 
 ![](/images/datadog/logo.png =400x)
 
-TRIPLE THREEで主にSREとして働いているtakehiro1111です！  
+SREとして働いているtakehiro1111です！  
 弊社ではオブザーバビリティツールとしてDatadogを運用しています。
 
 今回はDatadogの導入前後で考えたことや判断したことを振り返って記録として残します。
@@ -126,6 +126,8 @@ A. Sentry + AWS(CloudWatch, Athena + S3)
 B. Datadogで統合
 → 約9〜13万円/月
 ```
+
+前提として、Datadogは契約上、最低でも500ドルのコミットが必要です。
 
 ブログタイトルからネタバレしていますが、結論としてDatadogを選定しました。 
 最終的には目先のコストを抑える方向ではなく、より事業成長を加速させるためのツールという考え方を優先しました。
