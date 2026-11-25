@@ -1,5 +1,5 @@
 ---
-title: "Datadogの選定・設計・実装・運用判断をした記録"
+title: "Datadogの導入で考えたこと: 選定・設計・実装・運用の判断記録"
 emoji: "🐶"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Datadog", "SRE", "Observability", "Terraform", "ECS"]
