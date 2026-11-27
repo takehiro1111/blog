@@ -3,7 +3,7 @@ title: "Datadogの選定・設計・実装・運用判断をした記録"
 emoji: "🐶"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Datadog", "SRE", "Observability", "Terraform", "ECS"]
-published: false
+published: true
 publication_name: triplethree
 ---
 
